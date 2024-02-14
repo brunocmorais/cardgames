@@ -1,21 +1,21 @@
-import { Card } from "./card.js";
-import { cardNumbers, suits } from "./constants.js";
+import { Card } from "./Card.js";
+import { cardNumbers, suits } from "./Constants.js";
 
 export class Dealer {
 
-    #rngState;
+    private rngState;
     
-    constructor() {
-        this.#rngState = 1;
+    constructor(rngState : number) {
+        this.rngState = rngState;
     }
 
     dealCards() {
 
-        const cards = this.#getOrderedCards();
-        let deal = [];
+        const cards = this.getOrderedCards();
+        let deal : Card[] = [];
 
         while (cards.length > 0) {
-            const index = this.#rng() % cards.length;
+            const index = this.rng() % cards.length;
             const lastIndex = cards.length - 1;
 
             const cardA = cards[index];
@@ -24,18 +24,21 @@ export class Dealer {
             cards[index] = cardB;
             cards[lastIndex] = cardA;
 
-            deal.push(cards.pop());
+            const lastCard = cards.pop();
+
+            if (lastCard)
+                deal.push(lastCard);
         }
 
         return deal;
     } 
 
-    #rng() {
-        this.#rngState = (214013 * this.#rngState + 2531011) % Math.pow(2, 31);
-        return this.#rngState >> 16;
+    rng() {
+        this.rngState = (214013 * this.rngState + 2531011) % Math.pow(2, 31);
+        return this.rngState >> 16;
     }
 
-    #getOrderedCards() {
+    getOrderedCards() {
         let cards = [];
         
         for (let i = 0; i < cardNumbers.length; i++)

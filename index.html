@@ -2,12 +2,20 @@
     <head>
         <title>FreeCell</title>
         <meta charset="utf-8" />
-        <style>body { margin: 0; }</style>
+        <style>
+        body { 
+            margin: 0; 
+        }
+
+        .nozoom {
+            touch-action: manipulation;
+        }
+        </style>
     </head>
-    <body>
+    <body class="nozoom">
         <canvas id="canvas"></canvas>
         <script type="module"> 
-        import { Game } from './scripts/game.js'; 
+        import { Game } from './public/Game.js'; 
         document.game = new Game();
         </script>
     </body>

@@ -1,8 +1,12 @@
-import { blackSuits, redSuits } from "./constants.js";
+import { blackSuits, redSuits } from "./Constants.js";
 
 export class Card {
 
-    constructor(value, suit, number) {
+    public value;
+    public suit;
+    public number;
+
+    constructor(value : string, suit : string, number : string) {
         this.value = value;
         this.suit = suit;
         this.number = number;
