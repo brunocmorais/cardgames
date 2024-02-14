@@ -3,7 +3,6 @@
     "background_color": "green",
     "display": "fullscreen",
     "orientation": "landscape",
-    "scope": "index.html",
     "start_url": "https://brunocmorais.github.io/card-games/",
     "name": "FreeCell",
     "short_name": "FreeCell",

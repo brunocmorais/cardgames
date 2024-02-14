@@ -1,0 +1,9 @@
+html, body {
+    overflow: hidden;
+    overscroll-behavior: none;
+    margin: 0; 
+}
+
+.nozoom {
+    touch-action: manipulation;
+}

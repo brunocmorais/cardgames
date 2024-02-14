@@ -2,27 +2,12 @@
     <head>
         <title>FreeCell</title>
 	    <link rel="manifest" href="manifest.webmanifest" />
+        <link rel="stylesheet" href="style.css" />
         <meta charset="utf-8" />
-        <style>
-        body { 
-            margin: 0; 
-        }
-
-	html {
-	    overflow: hidden;
-	    overscroll-behavior: none;
-	}
-
-        .nozoom {
-            touch-action: manipulation;
-        }
-        </style>
+        <meta name="viewport" content="maximum-scale=1.0, user-scalable=no" />
     </head>
     <body class="nozoom">
         <canvas id="canvas"></canvas>
-        <script type="module"> 
-        import { Game } from './public/Game.js'; 
-        document.game = new Game();
-        </script>
+        <script type="module" src="public/Main.js"></script>
     </body>
 </html>
