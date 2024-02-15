@@ -1,4 +1,5 @@
 import { Card } from "./Card.js";
+import { Position } from "./Position.js";
 
 export class Column {
     
@@ -22,5 +23,24 @@ export class Column {
 
     get length() {
         return this.cards.length;
+    }
+
+    public getCardsBelow(card : Card) {
+        const index = this.indexOf(card);
+        const cards = [];
+
+        for (let i = index + 1; i < this.length; i++)
+            cards.push(this.getCard(i));
+
+        return cards;
+    }
+
+    public attemptToMoveDeepCard(card : Card, origin : Position) {
+        if (origin === Position.columnWithCard || origin === Position.columnWithoutCard) {
+            if (this.indexOf(card) != this.length - 1)
+                return true;
+        }
+
+        return false;
     }
 }

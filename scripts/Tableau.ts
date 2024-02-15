@@ -4,9 +4,10 @@ import { range } from "./Util.js";
 
 export class Tableau {
 
-    private columns : Column[] = range(8).map(_ => new Column());
+    private columns : Column[];
 
-    constructor(cards : Card[]) {
+    constructor(cards : Card[], columnCount : number) {
+        this.columns = range(columnCount).map(_ => new Column());
         this.createColumns(cards);
     }
 
@@ -16,7 +17,7 @@ export class Tableau {
         for (const card of cards) {
     
             this.columns[columnIndex].add(card);
-            columnIndex = (columnIndex + 1) % 8;
+            columnIndex = (columnIndex + 1) % this.length;
         }
     }
 
@@ -25,7 +26,7 @@ export class Tableau {
     }
 
     getCardColumn(card : Card) {
-        for (let column = 0; column < 8; column++)
+        for (let column = 0; column < this.length; column++)
             if (this.columns[column].indexOf(card) >= 0)
                 return this.columns[column];
     
@@ -33,7 +34,7 @@ export class Tableau {
     }
 
     indexOfCard(card : Card) {
-        for (let column = 0; column < 8; column++)
+        for (let column = 0; column < this.length; column++)
             if (this.columns[column].indexOf(card) >= 0)
                 return column;
     
@@ -46,5 +47,9 @@ export class Tableau {
 
     getEmptyColumnCount() {
         return this.columns.filter(x => x.length === 0).length;
+    }
+
+    get length() {
+        return this.columns.length;
     }
 }

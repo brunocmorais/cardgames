@@ -1,25 +1,28 @@
 import { CellData } from "./CellData.js";
-import { gameWidth } from "../Constants.js";
+import { cardVerticalDistance, cardWidthPadding } from "../Constants.js";
 
 export class ColumnsData {
 
-    private columnsInfo : CellData[] = [];
+    private columnsData : CellData[] = [];
 
-    constructor(canvasWidth : number) {
-        this.update(canvasWidth);
+    constructor(canvasWidth : number, columnCount : number) {
+        this.update(canvasWidth, columnCount);
     }
 
-    toArray = () => [...this.columnsInfo];
+    filter (fn : (x : CellData) => boolean) {
+        return this.columnsData.filter(fn);
+    }
 
-    public update(canvasWidth : number) {
-        this.columnsInfo = [];
+    public update(canvasWidth : number, columnCount : number) {
+        this.columnsData = [];
+        const tableauWidth = cardWidthPadding * columnCount;
         
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < columnCount; i++) {
             
-            const x = 80 * (i % 8) + (Math.floor(canvasWidth / 2) - Math.floor(gameWidth / 2));
-            const y = 18 * Math.floor(i / 8) + 140;
+            const x = cardWidthPadding * (i % columnCount) + (Math.floor(canvasWidth / 2) - Math.floor(tableauWidth / 2));
+            const y = cardVerticalDistance * Math.floor(i / columnCount) + 140;
     
-            this.columnsInfo.push(new CellData(x, y, i, undefined));
+            this.columnsData.push(new CellData(x, y, i, undefined));
         }
     }
 }

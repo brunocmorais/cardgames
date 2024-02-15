@@ -1,6 +1,6 @@
 import { Card } from "../Card.js";
 import { cardSize } from "../Constants.js";
-import { IObjectData } from "./IObjectData.js";
+import { Coordinate } from "../Coordinate.js";
 
 export class CardData {
 
@@ -26,11 +26,11 @@ export class CardData {
         this.z = z;
     }
 
-    isCardAboveObject(objectInfo : IObjectData) {
-        return !(this.x > objectInfo.x + cardSize.width ||
-            objectInfo.x > this.x + cardSize.width ||
-            this.y > objectInfo.y + cardSize.height ||
-            objectInfo.y > this.y + cardSize.height);
+    isCardAboveObject(objectData : Coordinate) {
+        return !(this.x > objectData.x + cardSize.width ||
+            objectData.x > this.x + cardSize.width ||
+            this.y > objectData.y + cardSize.height ||
+            objectData.y > this.y + cardSize.height);
     }
 
     isMouseInsideCard(x : number, y : number) {

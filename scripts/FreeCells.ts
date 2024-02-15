@@ -3,7 +3,11 @@ import { range } from "./Util.js";
 
 export class FreeCells {
 
-    private freeCells : (Card | null)[] = range(4).map(_ => null);
+    private freeCells : (Card | null)[];
+
+    constructor(cellCount : number) {
+        this.freeCells = range(cellCount).map(_ => null);
+    }
 
     get(index : number) {
         return this.freeCells[index];
@@ -28,9 +32,9 @@ export class FreeCells {
     getEmptyCellCount() {
         return this.freeCells.filter(x => x === null).length;
     }
-
-    getFirstFreeCellIndex() {
-        return this.freeCells.indexOf(null);
+    
+    get length () {
+        return this.freeCells.length;
     }
 }
 

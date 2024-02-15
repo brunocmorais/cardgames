@@ -19,11 +19,11 @@ export class CardData {
         this.y = y;
         this.z = z;
     }
-    isCardAboveObject(objectInfo) {
-        return !(this.x > objectInfo.x + cardSize.width ||
-            objectInfo.x > this.x + cardSize.width ||
-            this.y > objectInfo.y + cardSize.height ||
-            objectInfo.y > this.y + cardSize.height);
+    isCardAboveObject(objectData) {
+        return !(this.x > objectData.x + cardSize.width ||
+            objectData.x > this.x + cardSize.width ||
+            this.y > objectData.y + cardSize.height ||
+            objectData.y > this.y + cardSize.height);
     }
     isMouseInsideCard(x, y) {
         return x > this.x && x < this.x + cardSize.width &&

@@ -1,18 +1,22 @@
 import { CardData } from "./CardData.js";
-import { cardDistance, gameWidth } from "../Constants.js";
+import { cardVerticalDistance, cardWidthPadding } from "../Constants.js";
 import { FreeCell } from "../FreeCell.js";
 import { Card } from "../Card.js";
 
 export class CardsData {
 
-    private cardsInfo : CardData[] = [];
+    private cardsData : CardData[] = [];
     private freeCell : FreeCell; 
     private canvasWidth : number;
+    private tableauWidth: number;
+    private cellsWidth: number;
 
     constructor(canvasWidth : number, freeCell : FreeCell) {
 
         this.canvasWidth = canvasWidth;
         this.freeCell = freeCell;
+        this.tableauWidth = cardWidthPadding * freeCell.tableau.length;
+        this.cellsWidth = cardWidthPadding * (freeCell.cells.length + freeCell.foundation.length);
 
         this.update();
     }
@@ -22,61 +26,77 @@ export class CardsData {
         if (canvasWidth)
             this.canvasWidth = canvasWidth;
 
-        this.cardsInfo = [];
+        this.cardsData = [];
 
-        for (let i = 0; i < 4; i++) { // free cells
-            const cell = this.freeCell.freeCells.get(i);
+        this.updateFreeCellsData();
+        this.updateFoundationData();
+        this.updateTableauData();
+    }
 
-            if (cell) {
-                const x = 85 * i + (Math.floor(this.canvasWidth / 2) - Math.floor(gameWidth / 2)) - 35;
-                this.cardsInfo.push(this.createCardInfo(cell, x, 20, 1));
-            }
-        }
-
-        for (let i = 0; i < 4; i++) { // foundation
-            const foundation = this.freeCell.foundations.get(i);
-
-            if (foundation) {
-                const x = 85 * (i + 4) + (Math.floor(this.canvasWidth / 2) - Math.floor(gameWidth / 2));
-                let z = 1;
-
-                for (const card of foundation)
-                    this.cardsInfo.push(this.createCardInfo(card, x, 20, z++));
-            }
-        }
-
-        for (let i = 0; i < 8; i++) { // tableau
+    private updateTableauData() {
+        for (let i = 0; i < this.freeCell.tableau.length; i++) {
             const column = this.freeCell.tableau.getColumn(i);
 
-            const x = 80 * (i % 8) + (Math.floor(this.canvasWidth / 2) - Math.floor(gameWidth / 2));
+            const x = cardWidthPadding * (i % this.freeCell.tableau.length) + (Math.floor(this.canvasWidth / 2) - Math.floor(this.tableauWidth / 2));
 
             for (let j = 0; j < column.length; j++) {
                 const card = column.getCard(j);
-                const y = cardDistance * j + 140;
+                const y = cardVerticalDistance * j + 140;
                 const z = j + 1;
-                this.cardsInfo.push(this.createCardInfo(card, x, y, z));
+                this.cardsData.push(this.createCardData(card, x, y, z));
             }
         }
     }
 
-    private createCardInfo(card : Card, x : number, y : number, z : number) {
+    private updateFoundationData() {
+        for (let i = 0; i < this.freeCell.foundation.length; i++) {
+            const foundation = this.freeCell.foundation.get(i);
+
+            if (foundation) {
+                const x = cardWidthPadding * (i + this.freeCell.cells.length) + (Math.floor(this.canvasWidth / 2) - Math.floor(this.cellsWidth / 2));
+                let z = 1;
+
+                for (const card of foundation)
+                    this.cardsData.push(this.createCardData(card, x, 20, z++));
+            }
+        }
+    }
+
+    private updateFreeCellsData() {
+        for (let i = 0; i < this.freeCell.cells.length; i++) {
+            const cell = this.freeCell.cells.get(i);
+
+            if (cell) {
+                const x = cardWidthPadding * i + (Math.floor(this.canvasWidth / 2) - Math.floor(this.cellsWidth / 2));
+                this.cardsData.push(this.createCardData(cell, x, 20, 1));
+            }
+        }
+    }
+
+    private createCardData(card : Card, x : number, y : number, z : number) {
         const image = new Image();
-        image.src = `cards/${card.value}.png`;
+        image.src = `images/${card.value}.png`;
 
         return new CardData(x, y, z, false, image, card)
     }
 
-    toArray = () => [...this.cardsInfo];
-
-    getDraggingCard() {
-        return this.getDraggingCards()[0];
+    filter(fn: (x: CardData) => boolean) {
+        return this.cardsData.filter(fn);
     }
 
     getDraggingCards() {
-        return this.cardsInfo.filter(x => x.isDragging).sort((a, b) => a.z - b.z);
+        return this.cardsData.filter(x => x.isDragging).sort((a, b) => a.z - b.z);
     }
 
-    get(card : Card) {
-        return this.cardsInfo.filter(x => x.card == card)[0];
+    getBy(card : Card) {
+        return this.cardsData.filter(x => x.card == card)[0];
+    }
+
+    get(index : number) {
+        return this.cardsData[index];
+    }
+
+    get length() {
+        return this.cardsData.length;
     }
 }

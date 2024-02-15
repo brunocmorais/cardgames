@@ -1,20 +1,24 @@
 import { CellData } from "./CellData.js";
-import { gameWidth } from "../Constants.js";
+import { cardWidthPadding } from "../Constants.js";
 export class FreeCellsData {
     freeCellsData = [];
     image;
-    constructor(canvasWidth, image) {
-        this.image = image;
-        this.update(canvasWidth);
+    constructor(canvasWidth, freeCellsCount, foundationCount) {
+        this.image = new Image();
+        this.image.src = "images/empty.png";
+        this.update(canvasWidth, freeCellsCount, foundationCount);
     }
-    toArray = () => [...this.freeCellsData];
     get(index) {
         return this.freeCellsData[index];
     }
-    update(canvasWidth) {
+    filter(fn) {
+        return this.freeCellsData.filter(fn);
+    }
+    update(canvasWidth, freeCellsCount, foundationCount) {
         this.freeCellsData = [];
-        for (let i = 0; i < 4; i++) {
-            this.freeCellsData.push(new CellData(85 * i + (Math.floor(canvasWidth / 2) - Math.floor(gameWidth / 2)) - 35, 20, i, this.image));
+        const cellsWidth = cardWidthPadding * (freeCellsCount + foundationCount);
+        for (let i = 0; i < freeCellsCount; i++) {
+            this.freeCellsData.push(new CellData(cardWidthPadding * i + (Math.floor(canvasWidth / 2) - Math.floor(cellsWidth / 2)), 20, i, this.image));
         }
     }
 }

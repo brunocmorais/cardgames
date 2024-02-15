@@ -1,12 +1,12 @@
 import { Card } from "./Card.js";
-import { cardNumbers, suits } from "./Constants.js";
+import { cardNumbers } from "./Constants.js";
+const suits = ['C', 'D', 'H', 'S'];
 export class Dealer {
     rngState;
     constructor(rngState) {
         this.rngState = rngState;
     }
-    dealCards() {
-        const cards = this.getOrderedCards();
+    dealCards(cards) {
         let deal = [];
         while (cards.length > 0) {
             const index = this.rng() % cards.length;

@@ -1,35 +1,49 @@
 import { Dealer } from "./Dealer.js";
 import { FreeCells } from "./FreeCells.js";
-import { Foundations } from "./Foundations.js";
+import { Foundation } from "./Foundation.js";
 import { Tableau } from "./Tableau.js";
-import { Positions } from "./Positions.js";
+import { Position } from "./Position.js";
 import { cardNumbers } from "./Constants.js";
+import { GameType } from "./GameType.js";
 export class FreeCell {
-    cards;
     tableau;
-    freeCells;
-    foundations;
-    constructor(gameNumber) {
+    cells;
+    foundation;
+    constructor(gameNumber, gameType) {
+        let sizes;
+        switch (gameType) {
+            case GameType.default:
+                sizes = { decks: 1, columns: 8, cells: 4, foundations: 4, loop: false };
+                break;
+            case GameType.doubleTraditional:
+                sizes = { decks: 2, columns: 10, cells: 8, foundations: 8, loop: false };
+                break;
+            case GameType.doubleModern:
+                sizes = { decks: 2, columns: 10, cells: 6, foundations: 4, loop: true };
+                break;
+            default: throw new Error("Invalid game type!");
+        }
         const dealer = new Dealer(gameNumber);
-        this.cards = dealer.dealCards();
-        this.tableau = new Tableau(this.cards);
-        this.freeCells = new FreeCells();
-        this.foundations = new Foundations();
+        let cards = [];
+        for (let i = 0; i < sizes.decks; i++)
+            cards = [...cards, ...dealer.getOrderedCards()];
+        const dealedCards = dealer.dealCards(cards);
+        this.tableau = new Tableau(dealedCards, sizes.columns);
+        this.cells = new FreeCells(sizes.cells);
+        this.foundation = new Foundation(sizes.foundations, sizes.loop);
     }
     checkIfCardCanStartMoving(card) {
-        if (this.freeCells.indexOf(card) >= 0 ||
-            this.foundations.indexOf(card) >= 0)
+        if (this.cells.indexOf(card) >= 0 ||
+            this.foundation.indexOf(card) >= 0)
             return true;
         const column = this.tableau.getCardColumn(card);
         if (!column)
             return false;
-        const cardIndexOnColumn = column.indexOf(card);
         if (!this.numberOfCardsIsValid(card, column))
             return false;
         let evaluatingCard = card;
         let expectedNumber = cardNumbers[cardNumbers.indexOf(evaluatingCard.number) - 1];
-        for (let i = cardIndexOnColumn + 1; i < column.length; i++) {
-            const cardBelow = column.getCard(i);
+        for (const cardBelow of column.getCardsBelow(card)) {
             if (cardBelow.number != expectedNumber || cardBelow.isRed === evaluatingCard.isRed)
                 return false;
             evaluatingCard = cardBelow;
@@ -40,7 +54,7 @@ export class FreeCell {
     numberOfCardsIsValid(card, currentColumn, destinationColumn = undefined) {
         const cardIndexOnColumn = currentColumn.indexOf(card);
         const columnSize = currentColumn.length;
-        const freeCellCount = this.freeCells.getEmptyCellCount();
+        const freeCellCount = this.cells.getEmptyCellCount();
         let emptyColumnCount = this.tableau.getEmptyColumnCount();
         if (destinationColumn?.length == 0)
             emptyColumnCount--;
@@ -49,66 +63,59 @@ export class FreeCell {
         return true;
     }
     getCardOrigin(card) {
-        if (this.freeCells.indexOf(card) >= 0)
-            return [Positions.freeCells, this.freeCells.indexOf(card)];
-        else if (this.foundations.indexOf(card) >= 0)
-            return [Positions.foundation, this.foundations.indexOf(card)];
+        if (this.cells.indexOf(card) >= 0)
+            return [Position.freeCells, this.cells.indexOf(card)];
+        else if (this.foundation.indexOf(card) >= 0)
+            return [Position.foundation, this.foundation.indexOf(card)];
         else
-            return [Positions.columnWithCard, this.tableau.indexOfCard(card)];
+            return [Position.columnWithCard, this.tableau.indexOfCard(card)];
     }
     removeCardFromOrigin(origin, index) {
         switch (origin) {
-            case Positions.columnWithCard:
+            case Position.columnWithCard:
                 this.tableau.getColumn(index).remove();
                 break;
-            case Positions.freeCells:
-                this.freeCells.set(index, null);
+            case Position.freeCells:
+                this.cells.set(index, null);
                 break;
-            case Positions.foundation:
-                this.foundations.get(index).pop();
+            case Position.foundation:
+                this.foundation.get(index).pop();
                 break;
         }
-    }
-    attemptToMoveDeepCard(card, origin, indexOrigin) {
-        if (origin === Positions.columnWithCard || origin === Positions.columnWithoutCard) {
-            const column = this.tableau.getColumn(indexOrigin);
-            if (column.indexOf(card) != column.length - 1)
-                return true;
-        }
-        return false;
     }
     tryToMoveCardTo(destination, cards, index) {
         const multiCard = cards.length > 1;
         switch (destination) {
-            case Positions.freeCells:
+            case Position.freeCells:
                 if (!multiCard)
                     return this.tryToMoveCardToFreeCell(cards[0], index);
-            case Positions.foundation:
+            case Position.foundation:
                 if (!multiCard)
                     return this.tryToMoveCardToFoundation(cards[0], index);
-            case Positions.columnWithCard:
+            case Position.columnWithCard:
                 return this.tryToMoveCardsToColumn(cards, index);
-            case Positions.columnWithoutCard:
+            case Position.columnWithoutCard:
                 return this.tryToMoveCardsToColumn(cards, index);
         }
-        return false;
     }
     tryToMoveCardToFreeCell(card, index) {
         const [origin, indexOrigin] = this.getCardOrigin(card);
-        if (this.attemptToMoveDeepCard(card, origin, indexOrigin))
+        const column = this.tableau.getColumn(indexOrigin);
+        if (column.attemptToMoveDeepCard(card, origin))
             return false;
-        const result = this.freeCells.set(index, card);
+        const result = this.cells.set(index, card);
         if (result)
             this.removeCardFromOrigin(origin, indexOrigin);
         return result;
     }
     tryToMoveCardToFoundation(card, foundationIndex) {
         const [origin, indexOrigin] = this.getCardOrigin(card);
-        if (origin === Positions.foundation)
+        if (origin === Position.foundation)
             return false;
-        if (this.attemptToMoveDeepCard(card, origin, indexOrigin))
+        const column = this.tableau.getColumn(indexOrigin);
+        if (column.attemptToMoveDeepCard(card, origin))
             return false;
-        const result = this.foundations.push(foundationIndex, card);
+        const result = this.foundation.push(foundationIndex, card);
         if (result)
             this.removeCardFromOrigin(origin, indexOrigin);
         return result;
@@ -127,39 +134,39 @@ export class FreeCell {
             return false;
         const [origin, indexOrigin] = this.getCardOrigin(higherCard);
         for (let i = 0; i < cards.length; i++) {
-            const card = cards[i];
-            column.add(card);
+            column.add(cards[i]);
             this.removeCardFromOrigin(origin, indexOrigin);
         }
         return true;
     }
-    tryToMoveCardToWithoutDestination(card) {
+    tryToMoveCardToSomewhere(card) {
         const [position] = this.getCardOrigin(card);
-        if (position !== Positions.foundation)
-            for (let i = 0; i < 4; i++)
+        if (position !== Position.foundation)
+            for (let i = 0; i < this.foundation.length; i++)
                 if (this.tryToMoveCardToFoundation(card, i))
                     return true;
-        if (position === Positions.columnWithCard || position === Positions.columnWithoutCard) {
+        if (position === Position.columnWithCard || position === Position.columnWithoutCard) {
             const column = this.tableau.getCardColumn(card);
             const cardIndex = column.indexOf(card);
             const cards = [card];
             for (let i = cardIndex + 1; i < column.length; i++)
                 cards.push(column.getCard(i));
             const columnIndex = this.tableau.indexOf(column);
-            for (let i = 0; i < 8; i++) {
-                if (i === columnIndex)
+            for (let i = 0; i < this.tableau.length; i++) {
+                const c = this.tableau.getColumn(i);
+                if (i === columnIndex || c.length === 0)
                     continue;
                 if (this.tryToMoveCardsToColumn(cards, i))
                     return true;
             }
         }
         else {
-            for (let i = 0; i < 8; i++)
+            for (let i = 0; i < this.tableau.length; i++)
                 if (this.tryToMoveCardsToColumn([card], i))
                     return true;
         }
-        if (position !== Positions.freeCells)
-            for (let i = 0; i < 4; i++)
+        if (position !== Position.freeCells)
+            for (let i = 0; i < this.cells.length; i++)
                 if (this.tryToMoveCardToFreeCell(card, i))
                     return true;
         return false;

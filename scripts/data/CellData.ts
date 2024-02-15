@@ -1,9 +1,9 @@
 export class CellData {
     
-    public x : number;
-    public y : number;
-    public index : number;
-    public image : HTMLImageElement | undefined;
+    public x;
+    public y;
+    public index;
+    public image;
 
     constructor(x : number, y : number, index : number, image: HTMLImageElement | undefined) {
         this.x = x;

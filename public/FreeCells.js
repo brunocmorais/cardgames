@@ -1,6 +1,9 @@
 import { range } from "./Util.js";
 export class FreeCells {
-    freeCells = range(4).map(_ => null);
+    freeCells;
+    constructor(cellCount) {
+        this.freeCells = range(cellCount).map(_ => null);
+    }
     get(index) {
         return this.freeCells[index];
     }
@@ -19,7 +22,7 @@ export class FreeCells {
     getEmptyCellCount() {
         return this.freeCells.filter(x => x === null).length;
     }
-    getFirstFreeCellIndex() {
-        return this.freeCells.indexOf(null);
+    get length() {
+        return this.freeCells.length;
     }
 }

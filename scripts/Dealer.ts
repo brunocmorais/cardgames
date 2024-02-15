@@ -1,5 +1,7 @@
 import { Card } from "./Card.js";
-import { cardNumbers, suits } from "./Constants.js";
+import { cardNumbers } from "./Constants.js";
+
+const suits = ['C', 'D', 'H', 'S'];
 
 export class Dealer {
 
@@ -9,9 +11,8 @@ export class Dealer {
         this.rngState = rngState;
     }
 
-    dealCards() {
+    dealCards(cards : Card[]) {
 
-        const cards = this.getOrderedCards();
         let deal : Card[] = [];
 
         while (cards.length > 0) {

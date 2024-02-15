@@ -1,20 +1,16 @@
 import { FreeCell } from "./FreeCell.js";
 import { sleep } from "./Util.js";
-import { cardSize } from './Constants.js';
-import { FreeCellsData } from "./data/FreeCellsData.js";
-import { FoundationData } from "./data/FoundationData.js";
-import { CardsData } from "./data/CardsData.js";
+import { cardVerticalDistance, cardSize } from './Constants.js';
 import { MoveData } from "./data/MoveData.js";
-import { Positions } from "./Positions.js";
-import { ColumnsData } from "./data/ColumnsData.js";
+import { Position } from "./Position.js";
+import { Coordinate } from "./Coordinate.js";
+import { GameData } from "./data/GameData.js";
+import { GameType } from "./GameType.js";
 export class Game {
     canvas;
     ctx;
     freeCell;
-    freeCellsData;
-    foundationData;
-    columnsData;
-    cardsData;
+    data;
     constructor() {
         const element = document.getElementById("canvas");
         if (!element)
@@ -27,19 +23,18 @@ export class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         let initialGame = Math.floor(Math.random() * Math.pow(2, 32));
-        if (window.location.href.indexOf("?") >= 0) {
-            const searchParams = new URLSearchParams(window.location.href.substring(window.location.href.indexOf("?")));
+        let gameType = GameType.default;
+        const href = window.location.href;
+        if (href.indexOf("?") >= 0) {
+            const searchParams = new URLSearchParams(href.substring(href.indexOf("?")));
             if (searchParams.has("g"))
                 initialGame = parseInt("0" + searchParams.get("g"));
+            if (searchParams.has("t"))
+                gameType = "" + searchParams.get("t");
         }
         document.title = "FreeCell - #" + initialGame;
-        const cell = new Image();
-        cell.src = "cards/empty.png";
-        this.freeCell = new FreeCell(initialGame);
-        this.freeCellsData = new FreeCellsData(this.canvas.width, cell);
-        this.foundationData = new FoundationData(this.canvas.width, cell);
-        this.columnsData = new ColumnsData(this.canvas.width);
-        this.cardsData = new CardsData(this.canvas.width, this.freeCell);
+        this.freeCell = new FreeCell(initialGame, gameType);
+        this.data = new GameData(this.canvas.width, this.freeCell);
         this.setupEvents();
         this.drawGame(false);
     }
@@ -54,67 +49,61 @@ export class Game {
         window.addEventListener("resize", _ => this.resizeWindow());
     }
     async onMouseDblClick(e) {
-        const mouseX = e.clientX - this.canvas.getBoundingClientRect().left;
-        const mouseY = e.clientY - this.canvas.getBoundingClientRect().top;
-        const cardsClicked = this.cardsData.toArray().filter(x => x.isMouseInsideCard(mouseX, mouseY));
+        const cardsClicked = this.getSelectedCards(e);
         if (cardsClicked.length === 0)
             return;
         const cardClicked = cardsClicked.sort((a, b) => b.z - a.z)[0];
-        if (this.freeCell.tryToMoveCardToWithoutDestination(cardClicked.card))
+        if (this.freeCell.tryToMoveCardToSomewhere(cardClicked.card))
             await this.drawGame(true);
     }
-    onMouseDown(e) {
-        let mouseX, mouseY;
+    getTouchCoordinate(e) {
         if (e instanceof MouseEvent) {
-            mouseX = e.clientX - this.canvas.getBoundingClientRect().left;
-            mouseY = e.clientY - this.canvas.getBoundingClientRect().top;
+            return new Coordinate(e.clientX - this.canvas.getBoundingClientRect().left, e.clientY - this.canvas.getBoundingClientRect().top);
         }
         else if (e instanceof TouchEvent) {
-            mouseX = e.touches[0].clientX - this.canvas.getBoundingClientRect().left;
-            mouseY = e.touches[0].clientY - this.canvas.getBoundingClientRect().top;
+            return new Coordinate(e.touches[0].clientX - this.canvas.getBoundingClientRect().left, e.touches[0].clientY - this.canvas.getBoundingClientRect().top);
         }
-        const cardsClicked = this.cardsData.toArray().filter(x => x.isMouseInsideCard(mouseX, mouseY));
+        return new Coordinate(-1, -1);
+    }
+    getSelectedCards(e) {
+        const coord = this.getTouchCoordinate(e);
+        return this.data.cards.filter(x => x.isMouseInsideCard(coord.x, coord.y));
+    }
+    onMouseDown(e) {
+        const cardsClicked = this.getSelectedCards(e);
         if (cardsClicked.length > 0) {
-            const cardInfo = cardsClicked.sort((a, b) => b.z - a.z)[0];
-            if (this.freeCell.checkIfCardCanStartMoving(cardInfo.card)) {
-                cardInfo.isDragging = true;
-                const column = this.freeCell.tableau.getCardColumn(cardInfo.card);
+            const cardData = cardsClicked.sort((a, b) => b.z - a.z)[0];
+            const card = cardData.card;
+            if (this.freeCell.checkIfCardCanStartMoving(card)) {
+                cardData.isDragging = true;
+                const column = this.freeCell.tableau.getCardColumn(card);
                 if (column) {
-                    const cardIndexOnColumn = column.indexOf(cardInfo.card);
-                    const columnSize = column.length;
-                    for (let i = cardIndexOnColumn + 1; i < columnSize; i++) {
-                        const card = column.getCard(i);
-                        const cardBelowInfo = this.cardsData.get(card);
-                        cardBelowInfo.isDragging = true;
+                    for (const cardBelow of column.getCardsBelow(card)) {
+                        const cardBelowData = this.data.cards.getBy(cardBelow);
+                        cardBelowData.isDragging = true;
                     }
                 }
             }
         }
     }
     async onMouseMove(e) {
-        const cards = this.cardsData.getDraggingCards();
+        const cards = this.data.cards.getDraggingCards();
         if (cards.length > 0) {
             for (let i = 0; i < cards.length; i++) {
-                const card = cards[i];
-                if (e instanceof MouseEvent) {
-                    card.x = Math.floor(e.clientX - this.canvas.getBoundingClientRect().left - cardSize.width / 2);
-                    card.y = Math.floor(e.clientY - this.canvas.getBoundingClientRect().top - cardSize.height / 2) + (i * 20);
-                }
-                else if (e instanceof TouchEvent) {
-                    card.x = Math.floor(e.touches[0].clientX - this.canvas.getBoundingClientRect().left - cardSize.width / 2);
-                    card.y = Math.floor(e.touches[0].clientY - this.canvas.getBoundingClientRect().top - cardSize.height / 2) + (i * 20);
-                }
+                const coord = this.getTouchCoordinate(e);
+                cards[i].x = Math.floor(coord.x - cardSize.width / 2);
+                cards[i].y = Math.floor(coord.y - cardSize.height / 2) + (i * cardVerticalDistance);
             }
             await this.drawGame(false);
         }
     }
     async onMouseUp() {
-        const draggingCards = this.cardsData.getDraggingCards();
+        const draggingCards = this.data.cards.getDraggingCards();
         if (draggingCards.length > 0) {
-            const movingInfo = this.defineMovingDestination(draggingCards);
-            if (movingInfo.length > 0) {
-                for (const movingInfoItem of movingInfo) {
-                    if (this.freeCell.tryToMoveCardTo(movingInfoItem.destination, draggingCards.map(x => x.card), movingInfoItem.index))
+            const movingData = this.defineMovingDestination(draggingCards);
+            if (movingData.length > 0) {
+                for (const item of movingData) {
+                    if (this.freeCell.tryToMoveCardTo(item.destination, draggingCards.map(x => x.card), item.index))
                         break;
                 }
             }
@@ -126,10 +115,7 @@ export class Game {
     async resizeWindow() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.freeCellsData.update(this.canvas.width);
-        this.foundationData.update(this.canvas.width);
-        this.columnsData.update(this.canvas.width);
-        this.cardsData.update(this.canvas.width);
+        this.data.update(this.canvas.width);
         await this.drawGame(false);
     }
     drawCard(card) {
@@ -138,72 +124,77 @@ export class Game {
     drawCell(cell, x, y) {
         this.ctx.drawImage(cell, x, y, cell.width, cell.height);
     }
-    isMovingToFreeCell(cardInfo) {
-        return this.freeCellsData.toArray().filter(x => cardInfo.isCardAboveObject(x))[0];
-    }
     defineMovingDestination(draggingCards) {
+        let moveData = [];
         const draggingCard = draggingCards[0];
-        const freeCellObjects = this.freeCellsData.toArray().filter(x => draggingCard.isCardAboveObject(x));
+        const freeCellObjects = this.data.freeCells.filter(x => draggingCard.isCardAboveObject(x));
         if (freeCellObjects.length > 0)
-            return freeCellObjects.map(x => new MoveData(x.index, Positions.freeCells));
-        const foundationObjects = this.foundationData.toArray().filter(x => draggingCard.isCardAboveObject(x));
+            moveData = [...moveData, ...freeCellObjects.map(x => new MoveData(x.index, Position.freeCells))];
+        const foundationObjects = this.data.foundation.filter(x => draggingCard.isCardAboveObject(x));
         if (foundationObjects.length > 0)
-            return foundationObjects.map(x => new MoveData(x.index, Positions.foundation));
-        const cardObjects = this.cardsData.toArray().filter(x => draggingCard.isCardAboveObject(x) &&
+            moveData = [...moveData, ...foundationObjects.map(x => new MoveData(x.index, Position.foundation))];
+        const cardObjects = this.data.cards.filter(x => draggingCard.isCardAboveObject(x) &&
             draggingCards.indexOf(x) < 0).sort((a, b) => a.z - b.z);
         if (cardObjects.length > 0) {
-            return cardObjects.map(x => {
-                const column = this.freeCell.tableau.getCardColumn(x.card);
-                return new MoveData(this.freeCell.tableau.indexOf(column), Positions.columnWithCard);
-            });
+            moveData = [...moveData, ...cardObjects.map(x => {
+                    const column = this.freeCell.tableau.getCardColumn(x.card);
+                    return new MoveData(this.freeCell.tableau.indexOf(column), Position.columnWithCard);
+                }).filter(x => x.index != -1)];
         }
-        const columnObjects = this.columnsData.toArray().filter(x => draggingCard.isCardAboveObject(x));
+        const columnObjects = this.data.columns.filter(x => draggingCard.isCardAboveObject(x));
         if (columnObjects.length > 0)
-            return columnObjects.map(x => new MoveData(x.index, Positions.columnWithoutCard));
-        return [];
+            moveData = [...moveData, ...columnObjects.map(x => new MoveData(x.index, Position.columnWithoutCard))];
+        return moveData;
     }
     async drawCells() {
-        while (!this.freeCellsData.image.complete)
+        while (!this.data.freeCells.image.complete || !this.data.foundation.image.complete)
             await sleep(100);
-        for (let i = 0; i < 4; i++) {
-            const freeCellInfo = this.freeCellsData.toArray()[i];
-            this.drawCell(this.freeCellsData.image, freeCellInfo.x, freeCellInfo.y);
-            const freeCellCard = this.freeCell.freeCells.get(i);
-            if (freeCellCard)
-                this.drawCard(this.cardsData.get(freeCellCard));
-        }
-        for (let i = 0; i < 4; i++) {
-            const foundation = this.foundationData.toArray()[i];
-            this.drawCell(this.freeCellsData.image, foundation.x, foundation.y);
-            const foundationCards = this.freeCell.foundations.get(i);
-            if (foundationCards.length > 0) {
+        this.drawFreeCells();
+        this.drawFoundation();
+    }
+    drawFoundation() {
+        for (let i = 0; i < this.freeCell.foundation.length; i++) {
+            const foundation = this.data.foundation.get(i);
+            this.drawCell(this.data.freeCells.image, foundation.x, foundation.y);
+            const foundationCards = this.freeCell.foundation.get(i);
+            if (foundationCards.length > 0)
                 for (const foundationCard of foundationCards)
-                    this.drawCard(this.cardsData.get(foundationCard));
-            }
+                    this.drawCard(this.data.cards.getBy(foundationCard));
+        }
+    }
+    drawFreeCells() {
+        for (let i = 0; i < this.freeCell.cells.length; i++) {
+            const freeCellData = this.data.freeCells.get(i);
+            this.drawCell(this.data.freeCells.image, freeCellData.x, freeCellData.y);
+            const freeCellCard = this.freeCell.cells.get(i);
+            if (freeCellCard)
+                this.drawCard(this.data.cards.getBy(freeCellCard));
         }
     }
     async drawCards() {
-        for (const data of this.cardsData.toArray())
+        for (let i = 0; i < this.data.cards.length; i++) {
+            const data = this.data.cards.get(i);
             while (!data.image.complete)
                 await sleep(100);
-        for (let i = 0; i < 8; i++) {
+        }
+        for (let i = 0; i < this.freeCell.tableau.length; i++) {
             for (let j = 0; j < this.freeCell.tableau.getColumn(i).length; j++) {
                 const card = this.freeCell.tableau.getColumn(i).getCard(j);
-                const cardInfo = this.cardsData.get(card);
-                this.drawCard(cardInfo);
+                const cardData = this.data.cards.getBy(card);
+                this.drawCard(cardData);
             }
         }
-        const movingCardsInfo = this.cardsData.getDraggingCards();
-        if (movingCardsInfo.length > 0)
-            for (const cardInfo of movingCardsInfo)
-                this.drawCard(cardInfo);
+        const movingCardsData = this.data.cards.getDraggingCards();
+        if (movingCardsData.length > 0)
+            for (const cardData of movingCardsData)
+                this.drawCard(cardData);
     }
     async drawGame(update) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "green";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         if (update)
-            this.cardsData.update();
+            this.data.cards.update();
         await this.drawCells();
         await this.drawCards();
     }

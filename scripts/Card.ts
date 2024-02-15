@@ -1,5 +1,3 @@
-import { blackSuits, redSuits } from "./Constants.js";
-
 export class Card {
 
     public value;
@@ -12,7 +10,7 @@ export class Card {
         this.number = number;
     }
 
-    get isRed() { return redSuits.indexOf(this.suit) >= 0; }
+    get isRed() { return ['D', 'H'].indexOf(this.suit) >= 0; }
 
-    get isBlack() { return blackSuits.indexOf(this.suit) >= 0; }
+    get isBlack() { return ['C', 'S'].indexOf(this.suit) >= 0; }
 }

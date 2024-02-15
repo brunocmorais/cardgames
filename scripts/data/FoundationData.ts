@@ -1,5 +1,5 @@
 import { CellData } from "./CellData.js";
-import { gameWidth } from "../Constants.js";
+import { cardWidthPadding } from "../Constants.js";
 
 
 export class FoundationData {
@@ -7,23 +7,27 @@ export class FoundationData {
     private foundationData : CellData[] = [];
     public readonly image: HTMLImageElement;
 
-    constructor(canvasWidth : number, image : HTMLImageElement) {
-        this.image = image;
-        this.update(canvasWidth);
+    constructor(canvasWidth : number, foundationCount : number, freeCellCount : number) {
+        this.image = new Image();
+        this.image.src = "images/empty.png";
+        this.update(canvasWidth, foundationCount, freeCellCount);
     }
 
-    toArray = () => [...this.foundationData];
+    filter (fn: (x: CellData) => boolean) {
+        return this.foundationData.filter(fn);
+    }
 
     get (index : number) {
         return this.foundationData[index];
     }
 
-    public update(canvasWidth : number) {
+    public update(canvasWidth : number, foundationCount : number, freeCellCount : number) {
         this.foundationData = [];
+        const cellsWidth = cardWidthPadding * (foundationCount + freeCellCount);
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < foundationCount; i++) {
             this.foundationData.push(
-                new CellData(85 * (i + 4) + (Math.floor(canvasWidth / 2) - Math.floor(gameWidth / 2)), 20, i, this.image)
+                new CellData(cardWidthPadding * (i + freeCellCount) + (Math.floor(canvasWidth / 2) - Math.floor(cellsWidth / 2)), 20, i, this.image)
             );
         }
     }
