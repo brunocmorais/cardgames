@@ -23,10 +23,24 @@ export class Foundation {
         return -1;
     }
     validate(foundation, card) {
-        const conditionToAcceptAce = this.loop ?
-            foundation.length % cardNumbers.length === 0 :
-            foundation.length === 0;
-        if (conditionToAcceptAce)
+        let canAcceptAce;
+        if (!this.loop) {
+            canAcceptAce = foundation.length === 0;
+        }
+        else {
+            if (foundation.length > 0)
+                canAcceptAce = this.foundation.length === cardNumbers.length;
+            else {
+                canAcceptAce = true;
+                for (const other of this.foundation.filter(f => f !== foundation)) {
+                    if (other.filter(c => c.value === card.value).length > 0) {
+                        canAcceptAce = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (canAcceptAce)
             return card.number === 'A';
         const topCard = foundation[foundation.length - 1];
         return card.suit == topCard.suit && (cardNumbers.indexOf(card.number) - cardNumbers.indexOf(topCard.number)) == 1;
