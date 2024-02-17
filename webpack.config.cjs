@@ -10,7 +10,7 @@ module.exports = {
     }),
   ],
   entry: './src/Main.ts',
-  mode: 'development',
+  mode: 'production',
   module: {
     rules: [
       {

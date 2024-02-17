@@ -3,7 +3,7 @@
     "background_color": "green",
     "display": "fullscreen",
     "orientation": "landscape",
-    "start_url": "https://brunocmorais.github.io/freecell/",
+    "start_url": "./",
     "name": "FreeCell",
     "short_name": "FreeCell",
     "icons": [
