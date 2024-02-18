@@ -1,12 +1,12 @@
-import { FreeCell } from "../FreeCell";
+import { FreeCell } from "../GameTypes/FreeCell";
 import { CardsData } from "./CardsData";
 import { ColumnsData } from "./ColumnsData";
 import { FoundationData } from "./FoundationData";
-import { FreeCellsData } from "./FreeCellsData";
+import { CellsData } from "./CellsData";
 
 export class GameData {
 
-    public readonly freeCells : FreeCellsData;
+    public readonly freeCells : CellsData;
     public readonly foundation : FoundationData;
     public readonly columns : ColumnsData;
     public readonly cards : CardsData;
@@ -15,7 +15,7 @@ export class GameData {
     constructor(canvasWidth : number, freeCell: FreeCell) {
 
         this.freeCell = freeCell;
-        this.freeCells = new FreeCellsData(canvasWidth, freeCell.cells.length, freeCell.foundation.length);
+        this.freeCells = new CellsData(canvasWidth, freeCell.cells.length, freeCell.foundation.length);
         this.foundation = new FoundationData(canvasWidth, freeCell.foundation.length, freeCell.cells.length);
         this.columns = new ColumnsData(canvasWidth, freeCell.tableau.length);
         this.cards = new CardsData(canvasWidth, freeCell);

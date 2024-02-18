@@ -1,6 +1,6 @@
-import { Card } from "../Card";
-import { cardSize } from "../Constants";
-import { Coordinate } from "../Coordinate";
+import { Card } from "../Model/Card";
+import { cardSize } from "../Model/Constants";
+import { Coordinate } from "../Model/Coordinate";
 
 export class CardData {
 
@@ -33,8 +33,8 @@ export class CardData {
             objectData.y > this.y + cardSize.height);
     }
 
-    isMouseInsideCard(x : number, y : number) {
-        return x > this.x && x < this.x + cardSize.width &&
-            y > this.y && y < this.y + cardSize.height;
+    isInsideCard(coordinate : Coordinate) {
+        return coordinate.x > this.x && coordinate.x < this.x + cardSize.width &&
+            coordinate.y > this.y && coordinate.y < this.y + cardSize.height;
     }
 }

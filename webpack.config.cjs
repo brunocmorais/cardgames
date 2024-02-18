@@ -2,6 +2,9 @@ const path = require('path');
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
+  optimization: {
+    minimize: false
+  },
   plugins: [
     new CopyPlugin({
       patterns: [
@@ -29,7 +32,8 @@ module.exports = {
   },
   devServer: {
     static: path.join(__dirname, "build"),
-    compress: true,
+    compress: false,
     port: 3000,
+    hot: false
   },
 };

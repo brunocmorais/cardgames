@@ -1,28 +1,23 @@
 import { Card } from "./Card";
 import { Column } from "./Column";
-import { range } from "./Util";
+import { range } from "../../Util/Functions";
 
-export class Tableau {
+export abstract class Tableau {
 
-    private columns : Column[];
+    protected columns : Column[];
 
-    constructor(cards : Card[], columnCount : number) {
+    constructor(columnCount : number) {
         this.columns = range(columnCount).map(_ => new Column());
-        this.createColumns(cards);
     }
 
-    createColumns(cards : Card[]) {
-        let columnIndex = 0;
-    
-        for (const card of cards) {
-    
-            this.columns[columnIndex].add(card);
-            columnIndex = (columnIndex + 1) % this.length;
-        }
-    }
+    abstract fillColumns(cards : Card[]) : void;
 
     getColumn(index : number) {
         return this.columns[index];
+    }
+
+    getColumns() {
+        return [...this.columns];
     }
 
     getCardColumn(card : Card) {

@@ -3,6 +3,7 @@ export class Card {
     public value;
     public suit;
     public number;
+    public flipped = false;
 
     constructor(value : string, suit : string, number : string) {
         this.value = value;

@@ -4,7 +4,7 @@
   "description": "Simple FreeCell game",
   "type": "module",
   "scripts": {
-    "dev": "npx webpack-dev-server",
+    "dev": "npx webpack serve",
     "build": "npx webpack"
   },
   "author": "Bruno Morais",

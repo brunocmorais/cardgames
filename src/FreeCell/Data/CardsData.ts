@@ -1,19 +1,16 @@
-import { CardData } from "./CardData";
-import { cardVerticalDistance, cardWidthPadding } from "../Constants";
-import { FreeCell } from "../FreeCell";
-import { Card } from "../Card";
+import { cardVerticalDistance, cardWidthPadding } from "../../Common/Model/Constants";
+import { FreeCell } from "../GameTypes/FreeCell";
+import { BaseCardsData } from "../../Common/Data/BaseCardsData";
 
-export class CardsData {
-
-    private cardsData : CardData[] = [];
+export class CardsData extends BaseCardsData {
     private freeCell : FreeCell; 
-    private canvasWidth : number;
     private tableauWidth: number;
     private cellsWidth: number;
 
     constructor(canvasWidth : number, freeCell : FreeCell) {
 
-        this.canvasWidth = canvasWidth;
+        super(canvasWidth);
+
         this.freeCell = freeCell;
         this.tableauWidth = cardWidthPadding * freeCell.tableau.length;
         this.cellsWidth = cardWidthPadding * (freeCell.cells.length + freeCell.foundation.length);
@@ -71,32 +68,5 @@ export class CardsData {
                 this.cardsData.push(this.createCardData(cell, x, 20, 1));
             }
         }
-    }
-
-    private createCardData(card : Card, x : number, y : number, z : number) {
-        const image = new Image();
-        image.src = `images/${card.value}.png`;
-
-        return new CardData(x, y, z, false, image, card)
-    }
-
-    filter(fn: (x: CardData) => boolean) {
-        return this.cardsData.filter(fn);
-    }
-
-    getDraggingCards() {
-        return this.cardsData.filter(x => x.isDragging).sort((a, b) => a.z - b.z);
-    }
-
-    getBy(card : Card) {
-        return this.cardsData.filter(x => x.card == card)[0];
-    }
-
-    get(index : number) {
-        return this.cardsData[index];
-    }
-
-    get length() {
-        return this.cardsData.length;
     }
 }

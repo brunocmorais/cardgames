@@ -1,7 +1,7 @@
-import { Card } from "./Card";
-import { range } from "./Util";
+import { Card } from "../Common/Model/Card";
+import { range } from "../Util/Functions";
 
-export class FreeCells {
+export class Cells {
 
     private freeCells : (Card | null)[];
 

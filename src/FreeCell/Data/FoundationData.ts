@@ -1,6 +1,5 @@
-import { CellData } from "./CellData";
-import { cardWidthPadding } from "../Constants";
-
+import { CellData } from "../../Common/Data/CellData";
+import { cardWidthPadding } from "../../Common/Model/Constants";
 
 export class FoundationData {
 

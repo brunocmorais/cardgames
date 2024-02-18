@@ -1,5 +1,5 @@
-import { CellData } from "./CellData";
-import { cardVerticalDistance, cardWidthPadding } from "../Constants";
+import { CellData } from "../../Common/Data/CellData";
+import { cardVerticalDistance, cardWidthPadding } from "../../Common/Model/Constants";
 
 export class ColumnsData {
 

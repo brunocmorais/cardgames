@@ -1,37 +1,21 @@
-import { Dealer } from "./Dealer";
-import { FreeCells } from "./FreeCells";
-import { Foundation } from "./Foundation";
-import { Tableau } from "./Tableau";
-import { Position } from "./Position";
-import { cardNumbers } from "./Constants";
-import { Card } from "./Card";
-import { Column } from "./Column";
-import { GameType } from "./GameType";
+import { Dealer } from "../../Common/Model/Dealer";
+import { Cells } from "../Cells";
+import { Tableau } from "../../Common/Model/Tableau";
+import { Position } from "../Position";
+import { cardNumbers } from "../../Common/Model/Constants";
+import { Card } from "../../Common/Model/Card";
+import { Column } from "../../Common/Model/Column";
+import { FreeCellParams } from "../FreeCellParams";
+import { Foundation } from "../../Common/Model/Foundation";
+import { DefaultTableau } from "./Default/DefaultTableau";
 
-type GameParams = { 
-    decks: number, 
-    columns: number, 
-    cells: number, 
-    foundations: number,
-    loop: boolean
-};
+export abstract class FreeCell {
 
-export class FreeCell {
+    public readonly tableau;
+    public readonly cells;
+    public readonly foundation;
 
-    public tableau;
-    public cells;
-    public foundation;
-
-    constructor(gameNumber : number, gameType : GameType) {
-
-        let sizes : GameParams;
-
-        switch (gameType) {
-            case GameType.default: sizes = { decks: 1, columns: 8, cells: 4, foundations: 4, loop: false }; break;
-            case GameType.doubleTraditional: sizes = { decks: 2, columns: 10, cells: 8, foundations: 8, loop: false }; break;
-            case GameType.doubleModern: sizes = { decks: 2, columns: 10, cells: 6, foundations: 4, loop: true }; break;
-            default: throw new Error("Invalid game type!");
-        }
+    constructor(gameNumber : number, sizes : FreeCellParams, foundation: Foundation) {
 
         const dealer = new Dealer(gameNumber);
         let cards : Card[] = [];
@@ -41,9 +25,9 @@ export class FreeCell {
 
         const dealedCards = dealer.dealCards(cards);
 
-        this.tableau = new Tableau(dealedCards, sizes.columns);
-        this.cells = new FreeCells(sizes.cells);
-        this.foundation = new Foundation(sizes.foundations, sizes.loop);
+        this.tableau = new DefaultTableau(dealedCards, sizes.columns);
+        this.cells = new Cells(sizes.cells);
+        this.foundation = foundation;
     }
     
     public checkIfCardCanStartMoving(card : Card) {
@@ -75,7 +59,7 @@ export class FreeCell {
         return true;
     }
 
-    private numberOfCardsIsValid(card : Card, currentColumn : Column, destinationColumn : Column | undefined = undefined) {
+    protected numberOfCardsIsValid(card : Card, currentColumn : Column, destinationColumn : Column | undefined = undefined) {
         const cardIndexOnColumn = currentColumn.indexOf(card);
         const columnSize = currentColumn.length;
 
@@ -91,7 +75,7 @@ export class FreeCell {
         return true;
     }
 
-    private getCardOrigin(card : Card) {
+    protected getCardOrigin(card : Card) {
         if (this.cells.indexOf(card) >= 0)
             return [Position.freeCells, this.cells.indexOf(card)];
         else if (this.foundation.indexOf(card) >= 0)
@@ -100,7 +84,7 @@ export class FreeCell {
             return [Position.columnWithCard, this.tableau.indexOfCard(card)];
     }
 
-    private removeCardFromOrigin(origin : Position, index : number) {
+    protected removeCardFromOrigin(origin : Position, index : number) {
 
         switch (origin) {
             case Position.columnWithCard:
@@ -133,7 +117,7 @@ export class FreeCell {
         }
     }
     
-    private tryToMoveCardToFreeCell(card : Card, index : number) {
+    protected tryToMoveCardToFreeCell(card : Card, index : number) {
 
         const [ origin, indexOrigin ] = this.getCardOrigin(card);
 
@@ -150,7 +134,7 @@ export class FreeCell {
         return result;
     }
 
-    private tryToMoveCardToFoundation(card : Card, foundationIndex : number) {
+    protected tryToMoveCardToFoundation(card : Card, foundationIndex : number) {
 
         const [origin, indexOrigin] = this.getCardOrigin(card);
 
@@ -170,7 +154,7 @@ export class FreeCell {
         return result;
     }
 
-    private tryToMoveCardsToColumn(cards : Card[], columnIndex : number) {
+    protected tryToMoveCardsToColumn(cards : Card[], columnIndex : number) {
 
         const higherCard = cards[0];
         const column = this.tableau.getColumn(columnIndex);
@@ -217,10 +201,12 @@ export class FreeCell {
         
             const columnIndex = this.tableau.indexOf(column);
 
-            for (let i = 0; i < this.tableau.length; i++) {
-                const c = this.tableau.getColumn(i);
+            const orderedColumns = this.tableau.getColumns().orderByDesc(x => x.length);
 
-                if (i === columnIndex || c.length === 0)
+            for (const c of orderedColumns) {
+                const i = this.tableau.indexOf(c);
+
+                if (i === columnIndex)
                     continue;
 
                 if (this.tryToMoveCardsToColumn(cards, i))

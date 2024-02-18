@@ -1,5 +1,5 @@
 import { Card } from "./Card";
-import { Position } from "./Position";
+import { Position } from "../../FreeCell/Position";
 
 export class Column {
     
