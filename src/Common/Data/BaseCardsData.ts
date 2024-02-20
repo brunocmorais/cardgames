@@ -3,7 +3,7 @@ import { Card } from "../Model/Card";
 
 export abstract class BaseCardsData {
 
-    protected cardsData : CardData[] = [];
+    protected readonly cardsData : CardData[] = [];
     protected canvasWidth : number;
     public readonly cardBack : HTMLImageElement;
 

@@ -1,44 +1,43 @@
-import { FreeCell } from "./GameTypes/FreeCell";
+import { FreeCell } from "./FreeCell";
 import { sleep } from "../Util/Functions";
 import { MoveData } from "../Common/Data/MoveData";
 import { Position } from "./Position";
 import { CardData } from "../Common/Data/CardData";
 import { Column } from "../Common/Model/Column";
-import { GameData } from "./Data/GameData";
-import { GameType } from "./GameTypes/FreeCellGameType";
-import { FreeCellFactory } from "./GameTypes/FreeCellFactory";
+import { FreeCellGameData } from "./Data/FreeCellGameData";
+import { FreeCellVariant } from "./FreeCellVariant";
+import { FreeCellFactory } from "./FreeCellFactory";
 import { BaseGameContext } from "../Common/BaseGameContext";
 import { BaseCardsData } from "../Common/Data/BaseCardsData";
 
-export class FreeCellGameContext extends BaseGameContext {
-    private freeCell : FreeCell;
-    private data : GameData;
+export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameData> {
     
     constructor() {
 
-        super();
+        let { initialGame, variant } = FreeCellGameContext.extractURLParams();
+        document.title = "FreeCell - #" + initialGame;
 
+        const freeCell = new FreeCellFactory().get(variant, [initialGame]);
+        super(freeCell, new FreeCellGameData(freeCell));
+    }
+
+    private static extractURLParams() {
         let initialGame = Math.floor(Math.random() * Math.pow(2, 32));
-        let gameType = GameType.default;
+        let variant = FreeCellVariant.default;
 
         const href = window.location.href;
 
         if (href.indexOf("?") >= 0) {
             const searchParams = new URLSearchParams(href.substring(href.indexOf("?")));
-            
+
             if (searchParams.has("g"))
                 initialGame = parseInt("0" + searchParams.get("g"));
 
             if (searchParams.has("t"))
-                gameType = ("" + searchParams.get("t") as string) as GameType;
+                variant = (searchParams.get("t") as string) as FreeCellVariant;
         }
 
-        document.title = "FreeCell - #" + initialGame;
-
-        const factory = new FreeCellFactory();
-
-        this.freeCell = factory.get(gameType, [initialGame]);
-        this.data = new GameData(this.canvas.width, this.freeCell);
+        return { initialGame, variant };
     }
 
     protected getCardsData() : BaseCardsData {
@@ -48,7 +47,7 @@ export class FreeCellGameContext extends BaseGameContext {
     protected async doActionWithDblClickedCards(cardsClicked : CardData[]) {
         const cardClicked = cardsClicked.orderByDesc(x => x.z)[0];
 
-        if (this.freeCell.tryToMoveCardToSomewhere(cardClicked.card))
+        if (this.game.tryToMoveCardToSomewhere(cardClicked.card))
             await this.drawGame(true);
     }
 
@@ -56,9 +55,9 @@ export class FreeCellGameContext extends BaseGameContext {
         const cardData = cards.orderByDesc(x => x.z)[0];
         const card = cardData.card;
 
-        if (this.freeCell.checkIfCardCanStartMoving(card)) {
+        if (this.game.checkIfCardCanStartMoving(card)) {
             cardData.isDragging = true;
-            const column = this.freeCell.tableau.getCardColumn(card);
+            const column = this.game.tableau.getCardColumn(card);
 
             if (column) {
                 for (const cardBelow of column.getCardsBelow(card)) {
@@ -74,7 +73,7 @@ export class FreeCellGameContext extends BaseGameContext {
 
         if (movingData.length > 0) {
             for (const item of movingData) {
-                if (this.freeCell.tryToMoveCardTo(item.destination, cards.map(x => x.card), item.index))
+                if (this.game.tryToMoveCardTo(item.destination, cards.map(x => x.card), item.index))
                     break;
             }
         }
@@ -104,8 +103,8 @@ export class FreeCellGameContext extends BaseGameContext {
 
         if (cardObjects.length > 0) {
             moveData = [...moveData, ...cardObjects.map(x => {
-                const column = this.freeCell.tableau.getCardColumn(x.card) as Column;
-                return new MoveData(this.freeCell.tableau.indexOf(column), Position.columnWithCard);
+                const column = this.game.tableau.getCardColumn(x.card) as Column;
+                return new MoveData(this.game.tableau.indexOf(column), Position.columnWithCard);
             }).filter(x => x.index != -1)];
         }
 
@@ -127,24 +126,26 @@ export class FreeCellGameContext extends BaseGameContext {
     }
     
     private drawFoundation() {
-        for (let i = 0; i < this.freeCell.foundation.length; i++) {
+        const cardsData = this.getCardsData();
+
+        for (let i = 0; i < this.game.foundation.length; i++) {
             const foundation = this.data.foundation.get(i);
             this.drawCell(this.data.freeCells.image, foundation.x, foundation.y);
 
-            const foundationCards = this.freeCell.foundation.get(i);
+            const foundationCards = this.game.foundation.get(i);
 
             if (foundationCards.length > 0)
                 for (const foundationCard of foundationCards)
-                    this.drawCard(this.getCardsData().getBy(foundationCard));
+                    this.drawCard(cardsData.getBy(foundationCard));
         }
     }
 
     private drawFreeCells() {
-        for (let i = 0; i < this.freeCell.cells.length; i++) {
+        for (let i = 0; i < this.game.cells.length; i++) {
             const freeCellData = this.data.freeCells.get(i);
             this.drawCell(this.data.freeCells.image, freeCellData.x, freeCellData.y);
 
-            const freeCellCard = this.freeCell.cells.get(i);
+            const freeCellCard = this.game.cells.get(i);
 
             if (freeCellCard)
                 this.drawCard(this.getCardsData().getBy(freeCellCard));
@@ -153,26 +154,22 @@ export class FreeCellGameContext extends BaseGameContext {
 
     private async drawCards() {
 
-        for (let i = 0; i < this.getCardsData().length; i++) {
-            const data = this.getCardsData().get(i);
+        const cardsData = this.getCardsData();
+        const movingCardsData = cardsData.getDraggingCards();
+
+        for (let i = 0; i < cardsData.length; i++) {
+            const data = cardsData.get(i);
 
             while (!data.image.complete)
                 await sleep(100);
         }
 
-        for (let i = 0; i < this.freeCell.tableau.length; i++) {
-            for (let j = 0; j < this.freeCell.tableau.getColumn(i).length; j++) {
-                const card = this.freeCell.tableau.getColumn(i).getCard(j);
-                const cardData = this.getCardsData().getBy(card);
-                this.drawCard(cardData);
-            }
-        }
-    
-        const movingCardsData = this.getCardsData().getDraggingCards();
+        for (const column of this.game.tableau.getColumns())
+            for (const card of column.getCards())
+                this.drawCard(cardsData.getBy(card));
         
-        if (movingCardsData.length > 0)
-            for (const cardData of movingCardsData)
-                this.drawCard(cardData);
+        for (const cardData of movingCardsData)
+            this.drawCard(cardData);
     }
 
     public async drawGame(update : boolean) {

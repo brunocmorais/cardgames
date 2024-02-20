@@ -9,6 +9,10 @@ export class Column {
         return this.cards[index];
     }
 
+    getCards() {
+        return [...this.cards];
+    }
+
     add(card : Card) {
         this.cards.push(card);
     }

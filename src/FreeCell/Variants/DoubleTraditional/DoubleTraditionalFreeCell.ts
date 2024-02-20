@@ -1,4 +1,4 @@
-import { FreeCell } from "../FreeCell";
+import { FreeCell } from "../../FreeCell";
 import { DefaultFoundation } from "../Default/DefaultFoundation";
 
 export class DoubleTraditionalFreeCell extends FreeCell {

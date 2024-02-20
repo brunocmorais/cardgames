@@ -1,4 +1,4 @@
-import { FreeCell } from "../FreeCell";
+import { FreeCell } from "../../FreeCell";
 import { ModernFoundation } from "./ModernFoundation";
 
 

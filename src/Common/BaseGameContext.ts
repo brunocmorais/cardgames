@@ -2,13 +2,18 @@ import { cardVerticalDistance, cardSize } from './Model/Constants';
 import { CardData } from "./Data/CardData";
 import { Coordinate } from "./Model/Coordinate";
 import { BaseCardsData } from './Data/BaseCardsData';
+import { IGameData } from './Data/IGameData';
+import { IGameContext } from './IGameContext';
+import { IGame } from './IGame';
 
-export abstract class BaseGameContext {
+export abstract class BaseGameContext<TGame extends IGame, TData extends IGameData> implements IGameContext {
 
     protected canvas : HTMLCanvasElement;
     protected ctx : CanvasRenderingContext2D;
+    protected game : TGame;
+    protected data : TData;
     
-    constructor() {
+    constructor(game: TGame, data : TData) {
         const element = document.getElementById("canvas");
 
         if (!element)
@@ -24,6 +29,10 @@ export abstract class BaseGameContext {
 
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+
+        this.game = game;
+        this.data = data;
+        this.data.update(this.canvas.width);
         
         this.setupEvents();
     }
@@ -116,7 +125,7 @@ export abstract class BaseGameContext {
     private async resizeWindow() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.getCardsData().update(this.canvas.width);
+        this.data.update(this.canvas.width);
         await this.drawGame(false);
     }
     

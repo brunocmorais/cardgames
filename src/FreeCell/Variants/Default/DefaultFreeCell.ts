@@ -1,13 +1,13 @@
-import { FreeCellParams } from "../../FreeCellParams";
-import { GameType } from "../FreeCellGameType";
-import { FreeCell } from "../FreeCell";
+import { FreeCellOptions } from "../../FreeCellOptions";
+import { FreeCellVariant } from "../../FreeCellVariant";
+import { FreeCell } from "../../FreeCell";
 import { DefaultFoundation } from "./DefaultFoundation";
 
 export class DefaultFreeCell extends FreeCell {
 
     constructor(gameNumber : number) {
         
-        const params : FreeCellParams = { 
+        const params : FreeCellOptions = { 
             decks: 1, 
             columns: 8, 
             cells: 4, 

@@ -1,10 +1,11 @@
-import { FreeCell } from "../GameTypes/FreeCell";
+import { FreeCell } from "../FreeCell";
 import { CardsData } from "./CardsData";
-import { ColumnsData } from "./ColumnsData";
+import { ColumnsData } from "../../Common/Data/ColumnsData";
 import { FoundationData } from "./FoundationData";
 import { CellsData } from "./CellsData";
+import { IGameData } from "../../Common/Data/IGameData";
 
-export class GameData {
+export class FreeCellGameData implements IGameData {
 
     public readonly freeCells : CellsData;
     public readonly foundation : FoundationData;
@@ -12,13 +13,13 @@ export class GameData {
     public readonly cards : CardsData;
     private readonly freeCell : FreeCell;
 
-    constructor(canvasWidth : number, freeCell: FreeCell) {
+    constructor(freeCell: FreeCell) {
 
         this.freeCell = freeCell;
-        this.freeCells = new CellsData(canvasWidth, freeCell.cells.length, freeCell.foundation.length);
-        this.foundation = new FoundationData(canvasWidth, freeCell.foundation.length, freeCell.cells.length);
-        this.columns = new ColumnsData(canvasWidth, freeCell.tableau.length);
-        this.cards = new CardsData(canvasWidth, freeCell);
+        this.freeCells = new CellsData(0, freeCell.cells.length, freeCell.foundation.length);
+        this.foundation = new FoundationData(0, freeCell.foundation.length, freeCell.cells.length);
+        this.columns = new ColumnsData(0, freeCell.tableau.length);
+        this.cards = new CardsData(0, freeCell);
     }
 
     public update(canvasWidth : number) {

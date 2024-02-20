@@ -1,5 +1,5 @@
 import { cardVerticalDistance, cardWidthPadding } from "../../Common/Model/Constants";
-import { FreeCell } from "../GameTypes/FreeCell";
+import { FreeCell } from "../FreeCell";
 import { BaseCardsData } from "../../Common/Data/BaseCardsData";
 
 export class CardsData extends BaseCardsData {
@@ -23,8 +23,6 @@ export class CardsData extends BaseCardsData {
         if (canvasWidth)
             this.canvasWidth = canvasWidth;
 
-        this.cardsData = [];
-
         this.updateFreeCellsData();
         this.updateFoundationData();
         this.updateTableauData();
@@ -40,7 +38,13 @@ export class CardsData extends BaseCardsData {
                 const card = column.getCard(j);
                 const y = cardVerticalDistance * j + 140;
                 const z = j + 1;
-                this.cardsData.push(this.createCardData(card, x, y, z));
+
+                const cardData = this.cardsData.filter(x => x.card === card)[0];
+
+                if (!cardData)
+                    this.cardsData.push(this.createCardData(card, x, y, z));
+                else
+                    cardData.setCardPosition(x, y, z);
             }
         }
     }
@@ -53,8 +57,15 @@ export class CardsData extends BaseCardsData {
                 const x = cardWidthPadding * (i + this.freeCell.cells.length) + (Math.floor(this.canvasWidth / 2) - Math.floor(this.cellsWidth / 2));
                 let z = 1;
 
-                for (const card of foundation)
-                    this.cardsData.push(this.createCardData(card, x, 20, z++));
+                for (const card of foundation) {
+
+                    const cardData = this.cardsData.filter(x => x.card === card)[0];
+
+                    if (!cardData)
+                        this.cardsData.push(this.createCardData(card, x, 20, z++));
+                    else
+                        cardData.setCardPosition(x, 20, z++);
+                }
             }
         }
     }
@@ -65,7 +76,12 @@ export class CardsData extends BaseCardsData {
 
             if (cell) {
                 const x = cardWidthPadding * i + (Math.floor(this.canvasWidth / 2) - Math.floor(this.cellsWidth / 2));
-                this.cardsData.push(this.createCardData(cell, x, 20, 1));
+                const cardData = this.cardsData.filter(x => x.card === cell)[0];
+
+                if (!cardData)
+                    this.cardsData.push(this.createCardData(cell, x, 20, 1));
+                else
+                    cardData.setCardPosition(x, 20, 1);
             }
         }
     }

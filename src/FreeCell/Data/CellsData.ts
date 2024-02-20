@@ -3,7 +3,7 @@ import { cardWidthPadding } from "../../Common/Model/Constants";
 
 export class CellsData {
 
-    private freeCellsData : CellData[] = [];
+    private readonly freeCellsData : CellData[] = [];
     public readonly image : HTMLImageElement;
 
     constructor(canvasWidth : number, freeCellsCount : number, foundationCount : number) {
@@ -21,13 +21,18 @@ export class CellsData {
     }
 
     public update(canvasWidth : number, freeCellsCount : number, foundationCount : number) {
-        this.freeCellsData = [];
+        
         const cellsWidth = cardWidthPadding * (freeCellsCount + foundationCount);
 
         for (let i = 0; i < freeCellsCount; i++) {
-            this.freeCellsData.push(
-                new CellData(cardWidthPadding * i + (Math.floor(canvasWidth / 2) - Math.floor(cellsWidth / 2)), 20, i, this.image)
-            );
+            const data = this.freeCellsData[i];
+            const x = cardWidthPadding * i + (Math.floor(canvasWidth / 2) - Math.floor(cellsWidth / 2));
+            const y = 20;
+
+            if (!data)
+                this.freeCellsData.push(new CellData(x, y, i, this.image));
+            else
+                data.definePosition(x, y);
         }
     }
 }

@@ -1,14 +1,14 @@
 import { Card } from "../../../Common/Model/Card";
 import { Column } from "../../../Common/Model/Column";
-import { FreeCellParams } from "../../FreeCellParams";
-import { FreeCell } from "../FreeCell";
+import { FreeCellOptions } from "../../FreeCellOptions";
+import { FreeCell } from "../../FreeCell";
 import { DefaultFoundation } from "../Default/DefaultFoundation";
 
 export class RelaxedFreeCell extends FreeCell {
 
     constructor(gameNumber : number) {
 
-        const params : FreeCellParams = { 
+        const params : FreeCellOptions = { 
             decks: 1, 
             columns: 8, 
             cells: 4, 

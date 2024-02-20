@@ -1,21 +1,21 @@
-import { Dealer } from "../../Common/Model/Dealer";
-import { Cells } from "../Cells";
-import { Tableau } from "../../Common/Model/Tableau";
-import { Position } from "../Position";
-import { cardNumbers } from "../../Common/Model/Constants";
-import { Card } from "../../Common/Model/Card";
-import { Column } from "../../Common/Model/Column";
-import { FreeCellParams } from "../FreeCellParams";
-import { Foundation } from "../../Common/Model/Foundation";
-import { DefaultTableau } from "./Default/DefaultTableau";
+import { Dealer } from "../Common/Model/Dealer";
+import { Cells } from "./Cells";
+import { Position } from "./Position";
+import { cardNumbers } from "../Common/Model/Constants";
+import { Card } from "../Common/Model/Card";
+import { Column } from "../Common/Model/Column";
+import { FreeCellOptions } from "./FreeCellOptions";
+import { Foundation } from "../Common/Model/Foundation";
+import { DefaultTableau } from "./Variants/Default/DefaultTableau";
+import { IGame } from "../Common/IGame";
 
-export abstract class FreeCell {
+export abstract class FreeCell implements IGame {
 
     public readonly tableau;
     public readonly cells;
     public readonly foundation;
 
-    constructor(gameNumber : number, sizes : FreeCellParams, foundation: Foundation) {
+    constructor(gameNumber : number, sizes : FreeCellOptions, foundation: Foundation) {
 
         const dealer = new Dealer(gameNumber);
         let cards : Card[] = [];
@@ -59,17 +59,13 @@ export abstract class FreeCell {
         return true;
     }
 
-    protected numberOfCardsIsValid(card : Card, currentColumn : Column, destinationColumn : Column | undefined = undefined) {
+    protected numberOfCardsIsValid(card : Card, currentColumn : Column) {
         const cardIndexOnColumn = currentColumn.indexOf(card);
         const columnSize = currentColumn.length;
 
         const freeCellCount = this.cells.getEmptyCellCount();
-        let emptyColumnCount = this.tableau.getEmptyColumnCount();
 
-        if (destinationColumn?.length == 0)
-            emptyColumnCount--;
-
-        if (columnSize - 1 - cardIndexOnColumn >= (freeCellCount + 1) * (emptyColumnCount + 1))
+        if (columnSize - 1 - cardIndexOnColumn >= (freeCellCount + 1))
             return false;
 
         return true;
@@ -169,7 +165,7 @@ export abstract class FreeCell {
 
         const originColumn = this.tableau.getCardColumn(higherCard);
         
-        if (originColumn && !this.numberOfCardsIsValid(higherCard, originColumn, column))
+        if (originColumn && !this.numberOfCardsIsValid(higherCard, originColumn))
             return false;
 
         const [origin, indexOrigin] = this.getCardOrigin(higherCard);
@@ -201,15 +197,18 @@ export abstract class FreeCell {
         
             const columnIndex = this.tableau.indexOf(column);
 
-            const orderedColumns = this.tableau.getColumns().orderByDesc(x => x.length);
+            let orderedColumns = this.tableau.getColumns().orderByDesc(x => x.length);
 
-            for (const c of orderedColumns) {
-                const i = this.tableau.indexOf(c);
+            if (cardIndex === 0)
+                orderedColumns = orderedColumns.filter(x => x.length > 0);
 
-                if (i === columnIndex)
+            for (const column of orderedColumns) {
+                const index = this.tableau.indexOf(column);
+
+                if (index === columnIndex)
                     continue;
 
-                if (this.tryToMoveCardsToColumn(cards, i))
+                if (this.tryToMoveCardsToColumn(cards, index))
                     return true;
             }
         } else {

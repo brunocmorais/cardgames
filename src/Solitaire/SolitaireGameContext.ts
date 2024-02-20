@@ -2,21 +2,17 @@ import { BaseGameContext } from "../Common/BaseGameContext";
 import { BaseCardsData } from "../Common/Data/BaseCardsData";
 import { CardData } from "../Common/Data/CardData";
 import { sleep } from "../Util/Functions";
-import { GameData } from "./Data/GameData";
+import { SolitaireGameData } from "./Data/SolitaireGameData";
 import { Solitaire } from "./Solitaire";
 
-export class SolitaireGameContext extends BaseGameContext {
-
-    private readonly data;
-    private readonly solitaire;
+export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGameData> {
 
     constructor() {
-        super();
-
         document.title = "Solitaire - #" + 1;
-
-        this.solitaire = new Solitaire(1);
-        this.data = new GameData(this.canvas.width, this.solitaire);
+        
+        const solitaire = new Solitaire(1);
+        const data = new SolitaireGameData(solitaire);
+        super(solitaire, data);
     }
 
     protected getCardsData(): BaseCardsData {
@@ -36,21 +32,22 @@ export class SolitaireGameContext extends BaseGameContext {
     }
 
     private async drawCards() {
+        
+        const cardsData = this.getCardsData();
 
-        while (!this.data.cards.cardBack.complete)
+        while (!cardsData.cardBack.complete)
             await sleep(100);
 
-        for (let i = 0; i < this.getCardsData().length; i++) {
-            const data = this.getCardsData().get(i);
+        for (let i = 0; i < cardsData.length; i++) {
+            const data = cardsData.get(i);
 
             while (!data.image.complete)
                 await sleep(100);
         }
 
-        for (let i = 0; i < this.solitaire.tableau.length; i++) {
-            for (let j = 0; j < this.solitaire.tableau.getColumn(i).length; j++) {
-                const card = this.solitaire.tableau.getColumn(i).getCard(j);
-                const cardData = this.getCardsData().getBy(card);
+        for (const column of this.game.tableau.getColumns()) {
+            for (const card of column.getCards()) {
+                const cardData = cardsData.getBy(card);
 
                 if (card.flipped)
                     this.drawCardBack(cardData);
@@ -58,8 +55,8 @@ export class SolitaireGameContext extends BaseGameContext {
                     this.drawCard(cardData);
             }
         }
-    
-        const movingCardsData = this.getCardsData().getDraggingCards();
+
+        const movingCardsData = cardsData.getDraggingCards();
         
         if (movingCardsData.length > 0)
             for (const cardData of movingCardsData)
@@ -75,15 +72,17 @@ export class SolitaireGameContext extends BaseGameContext {
     }
     
     private drawFoundation() {
-        for (let i = 0; i < this.solitaire.foundation.length; i++) {
+        const cardsData = this.getCardsData();
+
+        for (let i = 0; i < this.game.foundation.length; i++) {
             const foundation = this.data.foundation.get(i);
             this.drawCell(this.data.foundation.image, foundation.x, foundation.y);
 
-            const foundationCards = this.solitaire.foundation.get(i);
+            const foundationCards = this.game.foundation.get(i);
 
             if (foundationCards.length > 0)
                 for (const foundationCard of foundationCards)
-                    this.drawCard(this.getCardsData().getBy(foundationCard));
+                    this.drawCard(cardsData.getBy(foundationCard));
         }
     }
 

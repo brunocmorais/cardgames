@@ -1,4 +1,4 @@
-export enum GameType {
+export enum FreeCellVariant {
     default = '',
     doubleTraditional = 'doubletrad',
     doubleModern = 'doublemodern',

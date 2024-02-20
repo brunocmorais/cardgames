@@ -1,9 +1,9 @@
-import { CellData } from "../../Common/Data/CellData";
-import { cardVerticalDistance, cardWidthPadding } from "../../Common/Model/Constants";
+import { CellData } from "./CellData";
+import { cardVerticalDistance, cardWidthPadding } from "../Model/Constants";
 
 export class ColumnsData {
 
-    private columnsData : CellData[] = [];
+    private readonly columnsData : CellData[] = [];
 
     constructor(canvasWidth : number, columnCount : number) {
         this.update(canvasWidth, columnCount);
@@ -14,15 +14,18 @@ export class ColumnsData {
     }
 
     public update(canvasWidth : number, columnCount : number) {
-        this.columnsData = [];
+
         const tableauWidth = cardWidthPadding * columnCount;
-        
+
         for (let i = 0; i < columnCount; i++) {
-            
+            const data = this.columnsData[i];
             const x = cardWidthPadding * (i % columnCount) + (Math.floor(canvasWidth / 2) - Math.floor(tableauWidth / 2));
             const y = cardVerticalDistance * Math.floor(i / columnCount) + 140;
     
-            this.columnsData.push(new CellData(x, y, i, undefined));
+            if (!data)
+                this.columnsData.push(new CellData(x, y, i, undefined));
+            else
+                data.definePosition(x, y);
         }
     }
 }

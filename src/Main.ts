@@ -1,4 +1,4 @@
-import { BaseGameContext } from './Common/BaseGameContext';
+import { IGameContext } from './Common/IGameContext';
 import { FreeCellGameContext } from './FreeCell/FreeCellGameContext'; 
 import { SolitaireGameContext } from './Solitaire/SolitaireGameContext';
 
@@ -9,7 +9,7 @@ const gameName = a.pathname
     .replace("/index.html", "")
     .replace(/\//gi, "");
 
-let game : BaseGameContext;
+let game : IGameContext;
 
 switch (gameName) {
     case "freecell":
