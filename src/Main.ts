@@ -11,15 +11,11 @@ const gameName = a.pathname
 
 let game : IGameContext;
 
-switch (gameName) {
-    case "freecell":
-        game = new FreeCellGameContext();
-        break;
-    case "solitaire":
-        game = new SolitaireGameContext();
-        break;
-    default:
-        throw new Error("Unknown game!");
-}
+if (gameName.endsWith("freecell"))
+    game = new FreeCellGameContext();
+else if (gameName.endsWith("solitaire"))
+    game = new SolitaireGameContext();
+else
+    throw new Error("Unknown game!");
 
 game.drawGame(false);
