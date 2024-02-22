@@ -3,6 +3,7 @@ import { BaseCardsData } from "../Common/Data/BaseCardsData";
 import { CardData } from "../Common/Data/CardData";
 import { sleep } from "../Util/Functions";
 import { SolitaireGameData } from "./Data/SolitaireGameData";
+import { Position } from "./Position";
 import { Solitaire } from "./Solitaire";
 
 export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGameData> {
@@ -23,12 +24,35 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
         throw new Error("Method not implemented.");
     }
 
-    protected doActionWithSelectedCards(cards: CardData[]): Promise<void> {
-        throw new Error("Method not implemented.");
+    protected async doActionWithClick(e : MouseEvent): Promise<void> {
+        const coord = this.getTouchCoordinate(e);
+
+        if (this.data.redistribution.stack.isInsideCell(coord))
+            this.game.dealCard();
+
+        await this.drawGame(true);
     }
 
-    protected doActionWithReleasedCards(cards: CardData[]): Promise<void> {
-        throw new Error("Method not implemented.");
+    protected async doActionWithSelectedCards(cards: CardData[]): Promise<void> {
+        const cardData = cards.orderByDesc(x => x.z)[0];
+        cardData.isDragging = true;
+        // const card = cardData.card;
+        // const position = this.game.getCardPosition(card);
+
+        // switch (position) {
+        //     case Position.stack: 
+        //         this.game.dealCard(); 
+        //         break;
+        // }
+
+    }
+
+    protected async doActionWithReleasedCards(cards: CardData[]): Promise<void> {
+        
+        for (const draggingCard of cards)
+            draggingCard.isDragging = false;
+
+        await this.drawGame(true);
     }
 
     private async drawCards() {
@@ -56,6 +80,14 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
             }
         }
 
+        const redist = this.game.redistribution;
+
+        for (let i = 0; i < redist.stack.length; i++)
+            this.drawCardBack(this.data.cards.getBy(redist.stack.get(i)));
+        
+        for (let i = 0; i < redist.waste.length; i++)
+            this.drawCard(this.data.cards.getBy(redist.waste.get(i)));
+
         const movingCardsData = cardsData.getDraggingCards();
         
         if (movingCardsData.length > 0)
@@ -67,8 +99,12 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
         while (!this.data.foundation.image.complete)
             await sleep(100);
+
+        while (!this.getCardsData().cardBack.complete)
+            await sleep(100);
     
         this.drawFoundation();
+        this.drawRedistribution();
     }
     
     private drawFoundation() {
@@ -84,6 +120,14 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
                 for (const foundationCard of foundationCards)
                     this.drawCard(cardsData.getBy(foundationCard));
         }
+    }
+
+    private drawRedistribution() {
+        const redistData = this.data.redistribution;
+        const image = redistData.image;
+        const cards = redistData.stack;
+
+        this.drawCell(image, cards.x, cards.y);
     }
 
     public async drawGame(update : boolean) {

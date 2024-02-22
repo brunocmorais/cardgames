@@ -51,6 +51,10 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
             await this.drawGame(true);
     }
 
+    protected async doActionWithClick(e: MouseEvent): Promise<void> {
+        // nothing to do
+    }
+
     protected async doActionWithSelectedCards(cards : CardData[]) {
         const cardData = cards.orderByDesc(x => x.z)[0];
         const card = cardData.card;

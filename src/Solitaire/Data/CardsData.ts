@@ -6,12 +6,12 @@ export class CardsData extends BaseCardsData {
     private solitaire : Solitaire; 
     private tableauWidth: number;
 
-    constructor(canvasWidth : number, freeCell : Solitaire) {
+    constructor(canvasWidth : number, solitaire : Solitaire) {
 
         super(canvasWidth);
 
-        this.solitaire = freeCell;
-        this.tableauWidth = cardWidthPadding * freeCell.tableau.length;
+        this.solitaire = solitaire;
+        this.tableauWidth = cardWidthPadding * solitaire.tableau.length;
 
         this.update();
     }
@@ -23,6 +23,7 @@ export class CardsData extends BaseCardsData {
 
         this.updateFoundationData();
         this.updateTableauData();
+        this.updateRedistributionData();
     }
 
     private updateTableauData() {
@@ -63,6 +64,28 @@ export class CardsData extends BaseCardsData {
                     else
                         cardData.setCardPosition(x, 20, z++);
                 }
+            }
+        }
+    }
+
+    private updateRedistributionData() {
+        const redist = this.solitaire.redistribution;
+        const calculateX = (padding : number) => (cardWidthPadding * padding) + (Math.floor((this.canvasWidth / 2) - cardWidthPadding));
+        
+        const arrays = [redist.stack, redist.waste];
+
+        for (const [index, array] of arrays.entries()) {
+
+            for (let i = 0; i < array.length; i++) {
+                const card = array.get(i);
+                const cardData = this.cardsData.filter(x => x.card === card)[0];
+                const offset = Math.floor(i / 6) * 2;
+                const position = index === 0 ? -2.5 : -1.5;
+    
+                if (!cardData)
+                    this.cardsData.push(this.createCardData(card, calculateX(position) - offset, 20 - offset, i + 1));
+                else
+                    cardData.setCardPosition(calculateX(position) - offset, 20 - offset, i + 1);
             }
         }
     }

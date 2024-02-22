@@ -1,17 +1,17 @@
 import { IGame } from "../Common/IGame";
+import { Card } from "../Common/Model/Card";
 import { Dealer } from "../Common/Model/Dealer";
 import { Tableau } from "../Common/Model/Tableau";
 import { DefaultFoundation } from "./DefaultFoundation";
 import { DefaultTableau } from "./DefaultTableau";
+import { Position } from "./Position";
 import { Redistribution } from "./Redistribution";
-import { Waste } from "./Waste";
 
 export class Solitaire implements IGame {
 
     public readonly tableau : Tableau;
     public readonly foundation : DefaultFoundation;
-    public readonly stack : Redistribution;
-    public readonly waste : Waste;
+    public readonly redistribution : Redistribution;    
 
     constructor(gameNumber : number) {
 
@@ -21,7 +21,24 @@ export class Solitaire implements IGame {
 
         this.tableau = new DefaultTableau(dealedCards, 7);
         this.foundation = new DefaultFoundation(4);
-        this.stack = new Redistribution();
-        this.waste = new Waste();
+        this.redistribution = new Redistribution(dealedCards);
+    }
+
+    public dealCard() {
+        this.redistribution.dealCard();
+    }
+
+    public getCardPosition(card : Card) {
+
+        if (this.redistribution.stack.indexOf(card) >= 0)
+            return Position.stack;
+
+        if (this.redistribution.waste.indexOf(card) >= 0)
+            return Position.waste;
+
+        if (this.foundation.indexOf(card) >= 0)
+            return Position.foundation;
+
+        return Position.tableau;
     }
 }

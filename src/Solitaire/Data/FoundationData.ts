@@ -21,13 +21,17 @@ export class FoundationData {
     }
 
     public update(canvasWidth : number, foundationCount : number) {
-        this.foundationData = [];
+
         const cellsWidth = cardWidthPadding * (foundationCount);
 
         for (let i = 0; i < foundationCount; i++) {
-            this.foundationData.push(
-                new CellData((cardWidthPadding * (i + 1.5)) + (Math.floor(canvasWidth / 2) - Math.floor(cellsWidth / 2)), 20, i, this.image)
-            );
+            const x = (cardWidthPadding * (i + 1.5)) + (Math.floor(canvasWidth / 2) - Math.floor(cellsWidth / 2));
+            const y = 20;
+
+            if (!this.foundationData[i])
+                this.foundationData.push(new CellData(x, 20, i, this.image));
+            else
+                this.foundationData[i].definePosition(x, y);
         }
     }
 }

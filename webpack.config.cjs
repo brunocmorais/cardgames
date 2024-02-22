@@ -24,7 +24,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts'],
   },
   output: {
     filename: 'index.js',
@@ -34,6 +34,9 @@ module.exports = {
     static: path.join(__dirname, "build"),
     compress: false,
     port: 3000,
-    hot: false
+    hot: false,
+    client: {
+      overlay: false
+    }
   },
 };

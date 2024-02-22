@@ -42,6 +42,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
         this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
         this.canvas.addEventListener('mouseup', _ => this.onMouseUp());
         this.canvas.addEventListener('dblclick', e => this.onMouseDblClick(e));
+        this.canvas.addEventListener('click', e => this.onMouseClick(e));
 
         this.canvas.addEventListener('touchstart', e => this.onMouseDown(e));
         this.canvas.addEventListener('touchmove', e => this.onMouseMove(e));
@@ -67,6 +68,12 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     }
 
     protected abstract doActionWithDblClickedCards(cardsClicked : CardData[]) : Promise<void>;
+
+    private async onMouseClick(e : MouseEvent) {
+        await this.doActionWithClick(e);
+    }
+
+    protected abstract doActionWithClick(e : MouseEvent) : Promise<void>;
 
     protected getTouchCoordinate(e : Event) {
         if (e instanceof MouseEvent) {
