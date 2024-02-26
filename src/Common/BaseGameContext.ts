@@ -5,9 +5,11 @@ import { BaseCardsData } from './Data/BaseCardsData';
 import { IGameData } from './Data/IGameData';
 import { IGameContext } from './IGameContext';
 import { IGame } from './IGame';
+import { GameBackground } from './GameBackground';
 
 export abstract class BaseGameContext<TGame extends IGame, TData extends IGameData> implements IGameContext {
 
+    private background : GameBackground;
     protected canvas : HTMLCanvasElement;
     protected ctx : CanvasRenderingContext2D;
     protected game : TGame;
@@ -32,6 +34,8 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
 
         this.game = game;
         this.data = data;
+
+        this.background = new GameBackground(this.canvas, this.ctx);
         this.data.update(this.canvas.width);
         
         this.setupEvents();
@@ -141,7 +145,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     }
 
     protected drawCardBack(card : CardData) {
-        this.ctx.drawImage(this.getCardsData().cardBack, card.x, card.y, card.image.width, card.image.height);
+        this.ctx.drawImage(BaseCardsData.cardBack, card.x, card.y, card.image.width, card.image.height);
     }
     
     protected drawCell(cell : HTMLImageElement, x : number, y : number) {
@@ -150,8 +154,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     
     public async drawGame(update : boolean) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "green";
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        await this.background.draw();
     
         if (update)
             this.getCardsData().update(this.canvas.width);

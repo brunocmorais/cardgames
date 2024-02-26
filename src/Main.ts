@@ -1,4 +1,5 @@
 import { IGameContext } from './Common/IGameContext';
+import { EmptyGameContext } from './Empty/EmptyGameContext';
 import { FreeCellGameContext } from './FreeCell/FreeCellGameContext'; 
 import { SolitaireGameContext } from './Solitaire/SolitaireGameContext';
 
@@ -11,11 +12,16 @@ const gameName = a.pathname
 
 let game : IGameContext;
 
-if (gameName.endsWith("freecell"))
-    game = new FreeCellGameContext();
-else if (gameName.endsWith("solitaire"))
-    game = new SolitaireGameContext();
+const gameDict = {
+    freecell : FreeCellGameContext,
+    solitaire : SolitaireGameContext
+};
+
+const GameContext = gameDict[gameName as keyof typeof gameDict];
+
+if (!GameContext)
+    game = new EmptyGameContext();
 else
-    throw new Error("Unknown game!");
+    game = new GameContext();
 
 game.drawGame(false);

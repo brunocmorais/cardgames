@@ -59,7 +59,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
         
         const cardsData = this.getCardsData();
 
-        while (!cardsData.cardBack.complete)
+        while (!BaseCardsData.cardBack.complete)
             await sleep(100);
 
         for (let i = 0; i < cardsData.length; i++) {
@@ -100,7 +100,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
         while (!this.data.foundation.image.complete)
             await sleep(100);
 
-        while (!this.getCardsData().cardBack.complete)
+        while (!BaseCardsData.cardBack.complete)
             await sleep(100);
     
         this.drawFoundation();

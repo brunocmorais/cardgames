@@ -5,13 +5,14 @@ export abstract class BaseCardsData {
 
     protected readonly cardsData : CardData[] = [];
     protected canvasWidth : number;
-    public readonly cardBack : HTMLImageElement;
+    public static readonly cardBack : HTMLImageElement = new Image();
 
     constructor(canvasWidth : number) {
 
         this.canvasWidth = canvasWidth;
-        this.cardBack = new Image();
-        this.cardBack.src = "images/backr.png";
+
+        if (!BaseCardsData.cardBack.src)
+            BaseCardsData.cardBack.src = "images/backr.png";
     }
 
     public abstract update(canvasWidth : number | undefined) : void;
