@@ -4,8 +4,9 @@
   "description": "Simple FreeCell game",
   "type": "module",
   "scripts": {
-    "dev": "npx webpack serve",
-    "build": "npx webpack"
+    "dev": "npx webpack serve --config webpack.config.cjs",
+    "prd": "npx webpack serve --config webpack.prd.config.cjs",
+    "build": "npx webpack --config webpack.prd.config.cjs"
   },
   "author": "Bruno Morais",
   "license": "ISC",
@@ -16,5 +17,8 @@
     "webpack": "^5.90.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.2"
+  },
+  "dependencies": {
+    "webpack-merge": "^5.10.0"
   }
 }

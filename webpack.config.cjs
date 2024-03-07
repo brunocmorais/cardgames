@@ -1,36 +1,13 @@
 const path = require('path');
-const CopyPlugin = require("copy-webpack-plugin");
+const { merge } = require('webpack-merge');
+const prd = require("./webpack.prd.config.cjs");
 
-module.exports = {
+module.exports = merge(prd, {
   optimization: {
     minimize: false
   },
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        { from: "assets" }
-      ],
-    }),
-  ],
-  entry: './src/Main.ts',
   devtool: 'inline-source-map',
-  mode: 'production',
-  module: {
-    rules: [
-      {
-        test: /\.ts?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.jsx', '.js'],
-  },
-  output: {
-    filename: 'index.js',
-    path: path.resolve(__dirname, 'build'),
-  },
+  mode: 'development',
   devServer: {
     static: path.join(__dirname, "build"),
     compress: false,
@@ -40,4 +17,4 @@ module.exports = {
       overlay: false
     }
   },
-};
+});
