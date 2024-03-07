@@ -131,7 +131,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
     }
 
     public async drawGame(update : boolean) {
-        super.drawGame(update);
+        await super.drawGame(update);
 
         await this.drawCells();
         await this.drawCards();

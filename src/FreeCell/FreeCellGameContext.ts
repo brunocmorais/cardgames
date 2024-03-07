@@ -177,7 +177,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
     }
 
     public async drawGame(update : boolean) {
-        super.drawGame(update);
+        await super.drawGame(update);
 
         await this.drawCells();
         await this.drawCards();

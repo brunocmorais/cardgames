@@ -13,6 +13,7 @@ module.exports = {
     }),
   ],
   entry: './src/Main.ts',
+  devtool: 'inline-source-map',
   mode: 'production',
   module: {
     rules: [
