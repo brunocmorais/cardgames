@@ -1,3 +1,3 @@
-# FreeCell
+# CardGames
 
-Simple FreeCell game made with HTML5 and TypeScript.
+Simple online Card Games made with HTML5 and TypeScript.
