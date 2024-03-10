@@ -6,9 +6,7 @@ import { SolitaireGameContext } from './Solitaire/SolitaireGameContext';
 var a = document.createElement('a');
 a.href = window.location.href;
 
-const gameName = a.pathname
-    .replace(".html", "")
-    .replace(/\//gi, "");
+const gameName = (a.pathname.substring(a.pathname.lastIndexOf("/") + 1)).replace(".html", "");
 
 let game : IGameContext;
 
