@@ -107,7 +107,6 @@ export abstract class FreeCell implements IGame {
                 if (!multiCard)
                     return this.tryToMoveCardToFoundation(cards[0], index);
             case Position.columnWithCard:
-                return this.tryToMoveCardsToColumn(cards, index);
             case Position.columnWithoutCard:
                 return this.tryToMoveCardsToColumn(cards, index);
         }
@@ -119,7 +118,7 @@ export abstract class FreeCell implements IGame {
 
         const column = this.tableau.getColumn(indexOrigin);
 
-        if (column.attemptToMoveDeepCard(card, origin))
+        if (column.isDeepCard(card))
             return false;
 
         const result = this.cells.set(index, card);
@@ -139,7 +138,7 @@ export abstract class FreeCell implements IGame {
 
         const column = this.tableau.getColumn(indexOrigin);
 
-        if (column.attemptToMoveDeepCard(card, origin))
+        if (column.isDeepCard(card))
             return false;
 
         const result = this.foundation.push(foundationIndex, card);

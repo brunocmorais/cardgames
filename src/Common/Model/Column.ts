@@ -39,12 +39,8 @@ export class Column {
         return cards;
     }
 
-    public attemptToMoveDeepCard(card : Card, origin : Position) {
-        if (origin === Position.columnWithCard || origin === Position.columnWithoutCard) {
-            if (this.indexOf(card) != this.length - 1)
-                return true;
-        }
-
-        return false;
+    public isDeepCard(card : Card) {
+        const index = this.indexOf(card);
+        return index >= 0 && index != this.length - 1;
     }
 }

@@ -1,6 +1,8 @@
 import { BaseGameContext } from "../Common/BaseGameContext";
 import { BaseCardsData } from "../Common/Data/BaseCardsData";
 import { CardData } from "../Common/Data/CardData";
+import { MoveData } from "../Common/Data/MoveData";
+import { Column } from "../Common/Model/Column";
 import { sleep } from "../Util/Functions";
 import { SolitaireGameData } from "./Data/SolitaireGameData";
 import { Position } from "./Position";
@@ -9,19 +11,42 @@ import { Solitaire } from "./Solitaire";
 export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGameData> {
 
     constructor() {
-        document.title = "Solitaire - #" + 1;
+        let initialGame = SolitaireGameContext.extractURLParams();
+
+        if (initialGame === 0)
+            initialGame = Math.floor(Math.random() * Math.pow(2, 32));
+
+        document.title = "Solitaire - #" + initialGame;
         
-        const solitaire = new Solitaire(1);
+        const solitaire = new Solitaire(initialGame);
         const data = new SolitaireGameData(solitaire);
         super(solitaire, data);
+    }
+
+    private static extractURLParams() {
+        let initialGame = 0;
+
+        const href = window.location.href;
+
+        if (href.indexOf("?") >= 0) {
+            const searchParams = new URLSearchParams(href.substring(href.indexOf("?")));
+
+            if (searchParams.has("g"))
+                initialGame = parseInt("0" + searchParams.get("g"));
+        }
+
+        return initialGame;
     }
 
     protected getCardsData(): BaseCardsData {
         return this.data.cards;
     }
 
-    protected doActionWithDblClickedCards(cardsClicked: CardData[]): Promise<void> {
-        throw new Error("Method not implemented.");
+    protected async doActionWithDblClickedCards(cardsClicked: CardData[]): Promise<void> {
+        const cardClicked = cardsClicked.orderByDesc(x => x.z)[0];
+
+        if (this.game.tryToMoveCardToSomewhere(cardClicked.card))
+            await this.drawGame(true);
     }
 
     protected async doActionWithClick(e : MouseEvent): Promise<void> {
@@ -29,6 +54,13 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
         if (this.data.redistribution.stack.isInsideCell(coord))
             this.game.dealCard();
+        else {
+            const cardClicked = this.data.cards.filter(x => x.isInsideCard(coord))
+                .orderByDesc(x => x.z)[0];
+
+            if (cardClicked && cardClicked.card.flipped)
+                this.game.flipCard(cardClicked.card);
+        }
 
         await this.drawGame(true);
     }
@@ -36,23 +68,51 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
     protected async doActionWithSelectedCards(cards: CardData[]): Promise<void> {
         const cardData = cards.orderByDesc(x => x.z)[0];
         cardData.isDragging = true;
-        // const card = cardData.card;
-        // const position = this.game.getCardPosition(card);
-
-        // switch (position) {
-        //     case Position.stack: 
-        //         this.game.dealCard(); 
-        //         break;
-        // }
-
     }
 
     protected async doActionWithReleasedCards(cards: CardData[]): Promise<void> {
+        
+        const movingData = this.defineMovingDestination(cards);
+
+        if (movingData.length > 0) {
+            for (const item of movingData) {
+                if (this.game.tryToMoveCardTo(item.destination, cards.map(x => x.card), item.index))
+                    break;
+            }
+        }
         
         for (const draggingCard of cards)
             draggingCard.isDragging = false;
 
         await this.drawGame(true);
+    }
+
+    private defineMovingDestination(draggingCards : CardData[]) {
+
+        let moveData : MoveData[] = [];
+        const draggingCard = draggingCards[0];
+        
+        const foundationObjects = this.data.foundation.filter(x => draggingCard.isCardAboveObject(x));
+
+        if (foundationObjects.length > 0)
+            moveData = [...moveData, ...foundationObjects.map(x => new MoveData(x.index, Position.foundation))];
+
+        const cardObjects = this.getCardsData().filter(x => draggingCard.isCardAboveObject(x) &&
+            draggingCards.indexOf(x) < 0).orderBy(x => x.z);
+
+        if (cardObjects.length > 0) {
+            moveData = [...moveData, ...cardObjects.map(x => {
+                const column = this.game.tableau.getCardColumn(x.card) as Column;
+                return new MoveData(this.game.tableau.indexOf(column), Position.tableau);
+            }).filter(x => x.index != -1)];
+        }
+
+        const columnObjects = this.data.columns.filter(x => draggingCard.isCardAboveObject(x));
+
+        if (columnObjects.length > 0)
+            moveData = [...moveData, ...columnObjects.map(x => new MoveData(x.index, Position.tableau))];
+
+        return moveData;
     }
 
     private async drawCards() {

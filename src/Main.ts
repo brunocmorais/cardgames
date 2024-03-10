@@ -7,7 +7,7 @@ var a = document.createElement('a');
 a.href = window.location.href;
 
 const gameName = a.pathname
-    .replace("/index.html", "")
+    .replace(".html", "")
     .replace(/\//gi, "");
 
 let game : IGameContext;

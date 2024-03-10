@@ -13,8 +13,11 @@ import { BaseCardsData } from "../Common/Data/BaseCardsData";
 export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameData> {
     
     constructor() {
-
         let { initialGame, variant } = FreeCellGameContext.extractURLParams();
+
+        if (initialGame === 0)
+            initialGame = Math.floor(Math.random() * Math.pow(2, 32));
+        
         document.title = "FreeCell - #" + initialGame;
 
         const freeCell = new FreeCellFactory().get(variant, [initialGame]);
@@ -22,7 +25,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
     }
 
     private static extractURLParams() {
-        let initialGame = Math.floor(Math.random() * Math.pow(2, 32));
+        let initialGame = 0;
         let variant = FreeCellVariant.default;
 
         const href = window.location.href;

@@ -48,22 +48,22 @@ export class CardsData extends BaseCardsData {
     }
 
     private updateFoundationData() {
-        for (let i = 0; i < this.solitaire.foundation.length; i++) {
+        const foundationCount = this.solitaire.foundation.length;
+        const cellsWidth = cardWidthPadding * (foundationCount);
+
+        for (let i = 0; i < foundationCount; i++) {
             const foundation = this.solitaire.foundation.get(i);
+            const x = (cardWidthPadding * (i + 1.5)) + (Math.floor(this.canvasWidth / 2) - Math.floor(cellsWidth / 2));
+            let z = 1;
 
-            if (foundation) {
-                const x = cardWidthPadding + (Math.floor(this.canvasWidth / 2));
-                let z = 1;
+            for (const card of foundation) {
 
-                for (const card of foundation) {
+                const cardData = this.cardsData.filter(x => x.card === card)[0];
 
-                    const cardData = this.cardsData.filter(x => x.card === card)[0];
-
-                    if (!cardData)
-                        this.cardsData.push(this.createCardData(card, x, 20, z++));
-                    else
-                        cardData.setCardPosition(x, 20, z++);
-                }
+                if (!cardData)
+                    this.cardsData.push(this.createCardData(card, x, 20, z++));
+                else
+                    cardData.setCardPosition(x, 20, z++);
             }
         }
     }
