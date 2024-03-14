@@ -4,8 +4,8 @@
     "display": "standalone",
     "orientation": "landscape",
     "start_url": "/",
-    "name": "CardGames",
-    "short_name": "CardGames",
+    "name": "FreeCell",
+    "short_name": "FreeCell",
     "icons": [
         {
             "src": "images/icon-192x192.png",

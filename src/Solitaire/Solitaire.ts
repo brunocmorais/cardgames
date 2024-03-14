@@ -26,6 +26,37 @@ export class Solitaire implements IGame {
         this.redistribution = new Redistribution(dealedCards);
     }
 
+    public checkIfCardCanStartMoving(card : Card) {
+
+        if (this.foundation.indexOf(card) >= 0 || this.redistribution.waste.indexOf(card) >= 0)
+            return true;
+    
+        if (card.flipped)
+            return false;
+
+        const column = this.tableau.getCardColumn(card);
+
+        if (!column)
+            return false;
+
+        let evaluatingCard = card;
+        let expectedNumber = cardNumbers[cardNumbers.indexOf(evaluatingCard.number) - 1];
+
+        for (const cardBelow of column.getCardsBelow(card)) {
+            
+            if (cardBelow.number != expectedNumber || cardBelow.isRed === evaluatingCard.isRed)
+                return false;
+
+                if (evaluatingCard.flipped)
+                    return false;
+
+            evaluatingCard = cardBelow;
+            expectedNumber = cardNumbers[cardNumbers.indexOf(evaluatingCard.number) - 1];
+        }
+
+        return true;
+    }
+
     public dealCard() {
         this.redistribution.dealCard();
     }
@@ -80,14 +111,16 @@ export class Solitaire implements IGame {
 
         if (column.length > 0) {
             const lastCardInColumn = column.getCard(column.length - 1);
+
+            if (lastCardInColumn.flipped)
+                return false;
+
             const expectedNumber = cardNumbers[cardNumbers.indexOf(higherCard.number) + 1];
             
             if (expectedNumber != lastCardInColumn.number || lastCardInColumn.isRed === higherCard.isRed)
                 return false;
-        } else {
-            if (higherCard.number != 'K')
-                return false;
-        }
+        } else if (higherCard.number != 'K')
+            return false;
 
         const [origin, indexOrigin] = this.getCardPosition(higherCard);
 
@@ -122,6 +155,9 @@ export class Solitaire implements IGame {
     public tryToMoveCardToSomewhere(card : Card) {
         
         const [ position ] = this.getCardPosition(card);
+
+        if (position === Position.stack || card.flipped)
+            return;
 
         if (position !== Position.foundation)
             for (let i = 0; i < this.foundation.length; i++)

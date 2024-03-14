@@ -71,11 +71,11 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
         await this.doActionWithDblClickedCards(cardsClicked);
     }
 
-    protected abstract doActionWithDblClickedCards(cardsClicked : CardData[]) : Promise<void>;
-
     private async onMouseClick(e : MouseEvent) {
         await this.doActionWithClick(e);
     }
+
+    protected abstract doActionWithDblClickedCards(cardsClicked : CardData[]) : Promise<void>;
 
     protected abstract doActionWithClick(e : MouseEvent) : Promise<void>;
 

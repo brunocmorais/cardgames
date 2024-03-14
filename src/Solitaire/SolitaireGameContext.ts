@@ -51,15 +51,19 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
     protected async doActionWithClick(e : MouseEvent): Promise<void> {
         const coord = this.getTouchCoordinate(e);
-
-        if (this.data.redistribution.stack.isInsideCell(coord))
-            this.game.dealCard();
-        else {
-            const cardClicked = this.data.cards.filter(x => x.isInsideCard(coord))
+        const cardClicked = this.data.cards.filter(x => x.isInsideCard(coord))
                 .orderByDesc(x => x.z)[0];
 
-            if (cardClicked && cardClicked.card.flipped)
-                this.game.flipCard(cardClicked.card);
+        if (cardClicked) {
+            const card = cardClicked.card;
+            const [ position ] = this.game.getCardPosition(card); 
+    
+            if (position === Position.stack)
+                this.game.dealCard();
+            else if (card.flipped)
+                this.game.flipCard(card);
+        } else if (this.data.redistribution.stack.isInsideCell(coord)) {
+            this.game.dealCard();
         }
 
         await this.drawGame(true);
@@ -67,7 +71,21 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
     protected async doActionWithSelectedCards(cards: CardData[]): Promise<void> {
         const cardData = cards.orderByDesc(x => x.z)[0];
-        cardData.isDragging = true;
+        const card = cardData.card;
+
+        if (this.game.checkIfCardCanStartMoving(card)) {
+            cardData.isDragging = true;
+            const column = this.game.tableau.getCardColumn(card);
+
+            if (column) {
+                for (const cardBelow of column.getCardsBelow(card)) {
+                    const cardBelowData = this.getCardsData().getBy(cardBelow);
+                    cardBelowData.isDragging = true;
+                }
+            }
+        }
+
+        await this.drawGame(true);
     }
 
     protected async doActionWithReleasedCards(cards: CardData[]): Promise<void> {
@@ -118,9 +136,6 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
     private async drawCards() {
         
         const cardsData = this.getCardsData();
-
-        while (!BaseCardsData.cardBack.complete)
-            await sleep(100);
 
         for (let i = 0; i < cardsData.length; i++) {
             const data = cardsData.get(i);
