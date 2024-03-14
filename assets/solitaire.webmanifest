@@ -3,8 +3,7 @@
     "background_color": "green",
     "display": "standalone",
     "orientation": "landscape",
-    "start_url": "solitaire.html",
-    "scope": ".",
+    "start_url": "./solitaire.html",
     "name": "Solitaire",
     "short_name": "Solitaire",
     "icons": [

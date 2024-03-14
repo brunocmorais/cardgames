@@ -3,8 +3,7 @@
     "background_color": "green",
     "display": "standalone",
     "orientation": "landscape",
-    "start_url": "freecell.html",
-    "scope": ".",
+    "start_url": "./freecell.html",
     "name": "FreeCell",
     "short_name": "FreeCell",
     "icons": [
