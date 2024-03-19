@@ -24,6 +24,18 @@ export abstract class BaseCardsData {
         return new CardData(x, y, z, false, image, card)
     }
 
+    public setCardBack(deck : string) {
+
+        switch (deck) {
+            case "deck-blue":
+                BaseCardsData.cardBack.src = "images/backb.png";
+                break;
+            case "deck-red":
+                BaseCardsData.cardBack.src = "images/backr.png";
+                break;
+        }
+    }
+
     filter(fn: (x: CardData) => boolean) {
         return this.cardsData.filter(fn);
     }

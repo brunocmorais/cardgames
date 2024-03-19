@@ -3,9 +3,9 @@
     "background_color": "green",
     "display": "standalone",
     "orientation": "landscape",
-    "start_url": "./freecell.html",
-    "name": "FreeCell",
-    "short_name": "FreeCell",
+    "start_url": "/",
+    "name": "CardGames",
+    "short_name": "CardGames",
     "icons": [
         {
             "src": "images/icon-192x192.png",

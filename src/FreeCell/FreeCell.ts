@@ -14,9 +14,12 @@ export abstract class FreeCell implements IGame {
     public readonly tableau;
     public readonly cells;
     public readonly foundation;
+    public readonly gameNumber: number;
 
     constructor(gameNumber : number, sizes : FreeCellOptions, foundation: Foundation) {
 
+        this.gameNumber = gameNumber;
+        
         const dealer = new Dealer(gameNumber);
         let cards : Card[] = [];
 

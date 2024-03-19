@@ -1,1 +1,3 @@
-export interface IGame { }
+export interface IGame { 
+    gameNumber : number;
+}

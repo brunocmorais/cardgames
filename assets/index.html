@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+    <head>
+        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+	    <link rel="manifest" href="manifest.webmanifest" />
+        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="dialog.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <meta name="viewport" content="maximum-scale=1.0, user-scalable=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+    </head>
+    <body class="nozoom">
+        <div id="sidebar">
+            <button class="sidebar-button button fa fa-gamepad fa-2x" id="select-game" title="Selecionar jogo" />
+            <button class="sidebar-button button fa fa-file fa-2x" id="new-game" title="Nova partida" />
+            <button class="sidebar-button button fa fa-terminal fa-2x" id="select-game-number" title="Selecionar número da partida" />
+            <button class="sidebar-button button fa fa-refresh fa-2x" id="reset-game" title="Reiniciar" />
+            <!-- <button class="sidebar-button button fa fa-lightbulb-o fa-2x" title="Obter sugestão" /> -->
+            <!-- <button class="sidebar-button button fa fa-fast-forward fa-2x" title="Avançar automaticamente" /> -->
+            <button class="sidebar-button button fa fa-cog fa-2x" title="Configurações" id="settings" />
+            <button class="sidebar-button button fa fa-info-circle fa-2x" title="Sobre" id="about" />
+        </div>
+        <canvas id="canvas"></canvas>
+        <script type="module" src="index.js"></script>
+        
+        <!-- Dialog declaring -->
+        <dialog class="dialog center">
+            <div class="dialog-header">
+                <span class="dialog-title"></span>
+                <div class="dialog-close">&#x2715;</div>
+            </div>
+            <div class="dialog-body"></div>
+            <div class="dialog-footer"></div>
+        </dialog>
+
+        <!-- Templates declaring -->
+        <template class="select-game-template">
+            <select size="5" class="list">
+                <option value="freecell" selected>FreeCell</option>
+                <option value="doublefreecell">Double FreeCell (clássico)</option>
+                <option value="doublemodernfreecell">Double FreeCell (moderno)</option>
+                <option value="relaxedfreecell">Relaxed FreeCell</option>
+                <option value="solitaire">Paciência</option>
+            </select>
+        </template>
+
+        <template class="settings-template">
+            <fieldset>
+                <legend>Cor de fundo</legend>
+                <div class="green color-square"></div>
+                <div class="darkslateblue color-square"></div>
+                <div class="crimson color-square"></div>
+                <div class="lightcoral color-square"></div>
+                <div class="darkcyan color-square"></div>
+                <div class="aqua color-square"></div>
+                <div class="orange color-square"></div>
+                <div class="gray color-square"></div>
+                <div class="brown color-square"></div>
+            </fieldset>
+            <fieldset>
+                <legend>Tema do baralho</legend>
+                <div class="deck deck-blue"><img src="images/backb.png" /></div>
+                <div class="deck deck-red"><img src="images/backr.png" /></div>
+            </fieldset>
+        </template>
+
+        <template class="template-about">
+            <h3>Sobre o CardGames</h3>
+            <div>Jogos de baralho online tipo paciência <br />com estilo retrô em HTML5 e TypeScript.</div><br />
+            <a href="https://github.com/brunocmorais/cardgames" target="_blank">https://github.com/brunocmorais/cardgames</a><br />
+            <br /><small>© Bruno Costa de Morais - 2024 - Licença MIT</small>
+        </template>
+
+        <template class="template-game-number">
+            <span>Informe o número do jogo:</span>
+            <input type="text" id="game-number" />
+        </template>
+    </body>
+</html>

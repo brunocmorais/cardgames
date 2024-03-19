@@ -14,9 +14,11 @@ export class Solitaire implements IGame {
     public readonly tableau : Tableau;
     public readonly foundation : DefaultFoundation;
     public readonly redistribution : Redistribution;    
+    public readonly gameNumber: number;
 
     constructor(gameNumber : number) {
 
+        this.gameNumber = gameNumber;
         const dealer = new Dealer(gameNumber);
         const cards = dealer.getOrderedCards();
         const dealedCards = dealer.dealCards(cards);

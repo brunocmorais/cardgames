@@ -12,35 +12,13 @@ import { BaseCardsData } from "../Common/Data/BaseCardsData";
 
 export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameData> {
     
-    constructor() {
-        let { initialGame, variant } = FreeCellGameContext.extractURLParams();
+    constructor(variant : FreeCellVariant = FreeCellVariant.default) {
 
-        if (initialGame === 0)
-            initialGame = Math.floor(Math.random() * Math.pow(2, 32));
-        
+        let initialGame = Math.floor(Math.random() * Math.pow(2, 32));
         document.title = "FreeCell - #" + initialGame;
 
         const freeCell = new FreeCellFactory().get(variant, [initialGame]);
         super(freeCell, new FreeCellGameData(freeCell));
-    }
-
-    private static extractURLParams() {
-        let initialGame = 0;
-        let variant = FreeCellVariant.default;
-
-        const href = window.location.href;
-
-        if (href.indexOf("?") >= 0) {
-            const searchParams = new URLSearchParams(href.substring(href.indexOf("?")));
-
-            if (searchParams.has("g"))
-                initialGame = parseInt("0" + searchParams.get("g"));
-
-            if (searchParams.has("t"))
-                variant = (searchParams.get("t") as string) as FreeCellVariant;
-        }
-
-        return { initialGame, variant };
     }
 
     protected getCardsData() : BaseCardsData {
@@ -184,5 +162,25 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
 
         await this.drawCells();
         await this.drawCards();
+    }
+
+    public resetGame(): void {
+        const freeCell = new FreeCellFactory().get(FreeCellVariant.default, [this.game.gameNumber]);
+        this.game = freeCell;
+        this.data = new FreeCellGameData(freeCell);
+        this.data.update(this.canvas.width);
+    }
+
+    public newGame(gameNumber ? : number): void {
+        let initialGame = gameNumber ?? Math.floor(Math.random() * Math.pow(2, 32));
+        document.title = "FreeCell - #" + initialGame;
+        const freeCell = new FreeCellFactory().get(FreeCellVariant.default, [initialGame]);
+        this.game = freeCell;
+        this.data = new FreeCellGameData(freeCell);
+        this.data.update(this.canvas.width);
+    }
+
+    public getHint(): void {
+        throw new Error("Method not implemented.");
     }
 }

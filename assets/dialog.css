@@ -1,0 +1,136 @@
+
+.dialog {
+    position: absolute;
+    padding: 0;
+    min-width: 300px;
+    border: solid 3px;
+    background-color: #CCC;
+    border-top-color: #EEE;
+    border-left-color: #EEE;
+    border-right-color: #444;
+    border-bottom-color: #444;
+    user-select: none;
+}
+
+.dialog-header {
+    width: calc(100% - 10px);
+    padding: 5px;
+    background-color: blue;
+    font-weight: bolder;
+    color: white;
+    font-size: 13px;
+    text-align: left;
+}
+
+.dialog-close {
+    width: 14px;
+    height: 14px;
+    background-color: #CCC;
+    float: right;
+    border: solid 1px;
+    border-top-color: #EEE;
+    border-left-color: #EEE;
+    border-right-color: #444;
+    border-bottom-color: #444;
+    color: black;
+    text-align: center;
+    font-weight: bold;
+}
+
+.dialog-close:active {
+    border-top-color: #444;
+    border-left-color: #444;
+    border-right-color: #EEE;
+    border-bottom-color: #EEE;
+}
+
+.dialog-body {
+    padding: 1em;
+    padding-bottom: 0;
+    font-size: 13px;
+}
+
+.dialog-footer {
+    padding: 1em;
+}
+
+.dialog-button {
+    padding: 5px 10px 5px 10px;
+    border-radius: 0px;
+    border-width: 2px;
+    background-color: #CCC;
+    border-top-color: #EEE;
+    border-left-color: #EEE;
+    border-right-color: #444;
+    border-bottom-color: #444;
+    margin: 0 5px 0 5px;
+    font-size: 12px;
+}
+
+
+.list {
+    width: 100%; 
+    overflow-y: hidden;
+}
+
+.color-square {
+    width: 16px;
+    height: 16px;
+    border: solid 2px transparent;
+    float: left;
+    margin: 4px;
+}
+
+.color-square:hover {
+    border: solid 2px black;
+}
+
+.deck {
+    border: solid 2px transparent;
+    float: left;
+    margin: 4px;
+}
+
+.deck:hover {
+    border: solid 2px black;
+}
+
+.selected {
+    border: solid 2px #333;
+}
+
+.green {
+    background-color: green;
+}
+
+.darkslateblue {
+    background-color: darkslateblue;
+}
+
+.crimson {
+    background-color: crimson;
+}
+
+.lightcoral {
+    background-color: lightcoral;
+}
+
+.darkcyan {
+    background-color: darkcyan;
+}
+
+.aqua {
+    background-color: aqua;
+}
+
+.orange {
+    background-color: orange;
+}
+
+.gray {
+    background-color: gray;
+}
+
+.brown {
+    background-color: brown;
+}

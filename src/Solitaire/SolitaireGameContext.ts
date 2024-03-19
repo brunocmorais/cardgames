@@ -11,31 +11,14 @@ import { Solitaire } from "./Solitaire";
 export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGameData> {
 
     constructor() {
-        let initialGame = SolitaireGameContext.extractURLParams();
 
-        if (initialGame === 0)
-            initialGame = Math.floor(Math.random() * Math.pow(2, 32));
+        let initialGame = Math.floor(Math.random() * Math.pow(2, 32));
 
         document.title = "Solitaire - #" + initialGame;
         
         const solitaire = new Solitaire(initialGame);
         const data = new SolitaireGameData(solitaire);
         super(solitaire, data);
-    }
-
-    private static extractURLParams() {
-        let initialGame = 0;
-
-        const href = window.location.href;
-
-        if (href.indexOf("?") >= 0) {
-            const searchParams = new URLSearchParams(href.substring(href.indexOf("?")));
-
-            if (searchParams.has("g"))
-                initialGame = parseInt("0" + searchParams.get("g"));
-        }
-
-        return initialGame;
     }
 
     protected getCardsData(): BaseCardsData {
@@ -210,5 +193,27 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
         await this.drawCells();
         await this.drawCards();
+    }
+
+    public resetGame(): void {
+
+        const solitaire = new Solitaire(this.game.gameNumber);
+        this.game = solitaire;
+        this.data = new SolitaireGameData(solitaire);
+        this.data.update(this.canvas.width);
+    }
+
+    public newGame(gameNumber? : number): void {
+
+        let initialGame = gameNumber ?? Math.floor(Math.random() * Math.pow(2, 32));
+        document.title = "Solitaire - #" + initialGame;
+        const solitaire = new Solitaire(initialGame);
+        this.game = solitaire;
+        this.data = new SolitaireGameData(solitaire);
+        this.data.update(this.canvas.width);
+    }
+
+    public getHint(): void {
+        throw new Error("Method not implemented.");
     }
 }

@@ -6,6 +6,7 @@ import { IGameData } from './Data/IGameData';
 import { IGameContext } from './IGameContext';
 import { IGame } from './IGame';
 import { GameBackground } from './GameBackground';
+import { GameOptions } from './Model/GameOptions';
 
 export abstract class BaseGameContext<TGame extends IGame, TData extends IGameData> implements IGameContext {
 
@@ -29,7 +30,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
 
         this.ctx = ctx;
 
-        this.canvas.width = window.innerWidth;
+        this.canvas.width = window.innerWidth - 64;
         this.canvas.height = window.innerHeight;
 
         this.game = game;
@@ -41,18 +42,22 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
         this.setupEvents();
     }
 
+    public abstract resetGame() : void;
+    public abstract newGame(gameNumber? : number) : void;
+    public abstract getHint() : void;
+
     private setupEvents() {
-        this.canvas.addEventListener('mousedown', e => this.onMouseDown(e));
-        this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
-        this.canvas.addEventListener('mouseup', _ => this.onMouseUp());
-        this.canvas.addEventListener('dblclick', e => this.onMouseDblClick(e));
-        this.canvas.addEventListener('click', e => this.onMouseClick(e));
 
-        this.canvas.addEventListener('touchstart', e => this.onMouseDown(e));
-        this.canvas.addEventListener('touchmove', e => this.onMouseMove(e));
-        this.canvas.addEventListener('touchend', _ => this.onMouseUp());
+        this.canvas.onmousedown = (e => this.onMouseDown(e));
+        this.canvas.onmousemove = (e => this.onMouseMove(e));
+        this.canvas.onmouseup = (_ => this.onMouseUp());
+        this.canvas.ondblclick = (e => this.onMouseDblClick(e));
+        this.canvas.onclick = (e => this.onMouseClick(e));
+        this.canvas.ontouchstart = (e => this.onMouseDown(e));
+        this.canvas.ontouchmove = (e => this.onMouseMove(e));
+        this.canvas.ontouchend = (_ => this.onMouseUp());
 
-        window.addEventListener("resize", _ => this.resizeWindow());
+        window.onresize = _ => this.resizeWindow();
     }
 
     protected abstract getCardsData() : BaseCardsData;
@@ -134,7 +139,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     protected abstract doActionWithReleasedCards(cards: CardData[]) : Promise<void>;
 
     private async resizeWindow() {
-        this.canvas.width = window.innerWidth;
+        this.canvas.width = window.innerWidth - 64;
         this.canvas.height = window.innerHeight;
         this.data.update(this.canvas.width);
         await this.drawGame(false);
@@ -158,5 +163,16 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     
         if (update)
             this.getCardsData().update(this.canvas.width);
+    }
+
+    public async setOptions(gameOptions: GameOptions): Promise<void> {
+        
+        if (gameOptions.color)
+            this.background.setColor(gameOptions.color);
+
+        if (gameOptions.deck)
+            this.getCardsData().setCardBack(gameOptions.deck);
+
+        await this.drawGame(true);
     }
 }
