@@ -40,6 +40,7 @@ export class Main {
         this.defineSettingsEvent();
         this.defineAboutEvent();
         this.defineSelectGameNumberEvent();
+        this.defineGetHelpEvent();
     }
 
     private static defineSelectGameEvent() {
@@ -116,6 +117,13 @@ export class Main {
             });
 
             dialog.showDialog();
+        });
+    }
+
+    private static defineGetHelpEvent() {
+        document.getElementById("get-help")?.addEventListener("click", async function() {
+            game.getHint();
+            await game.drawGame(true);
         });
     }
 }

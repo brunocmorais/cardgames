@@ -1,5 +1,5 @@
 import { FreeCell } from "./FreeCell";
-import { sleep } from "../Util/Functions";
+import { range, sleep } from "../Util/Functions";
 import { MoveData } from "../Common/Data/MoveData";
 import { Position } from "./Position";
 import { CardData } from "../Common/Data/CardData";
@@ -9,6 +9,7 @@ import { FreeCellVariant } from "./FreeCellVariant";
 import { FreeCellFactory } from "./FreeCellFactory";
 import { BaseGameContext } from "../Common/BaseGameContext";
 import { BaseCardsData } from "../Common/Data/BaseCardsData";
+import { cardNumbers } from "../Common/Model/Constants";
 
 export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameData> {
     
@@ -181,6 +182,67 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
     }
 
     public getHint(): void {
-        throw new Error("Method not implemented.");
+
+        const cells = this.game.cells;
+        const tableau = this.game.tableau;
+        const foundation = this.game.foundation;
+        
+        for (let i = 0; i < cells.length; i++) {
+            const card = cells.get(i);
+
+            if (!card)
+                continue;
+
+            if (this.game.tryToMoveCardToSomewhere(card))
+                return;
+        }
+
+        for (let i = 0; i < tableau.length; i++) {
+            const column = tableau.getColumn(i);
+            const card = column.getCard(column.length - 1);
+
+            if (!card)
+                continue;
+
+            for (let j = 0; j < foundation.length; j++)
+                if (this.game.tryToMoveCardTo(Position.foundation, [ card ], j))
+                    return;
+        }
+
+        for (let i = 0; i < tableau.length; i++) {
+            const column = tableau.getColumn(i);
+
+            for (let j = 0; j < column.length; j++) {
+                const card = column.getCard(j);
+                const cardAbove = column.getCard(j - 1);
+
+                if (cardAbove && cardNumbers.indexOf(cardAbove.number) === 
+                    cardNumbers.indexOf(card.number) + 1 && cardAbove.isBlack != card.isBlack)
+                    continue;
+
+                const cards = column.getCardsBelow(card);
+
+                if (this.game.checkIfCardCanStartMoving(card)) {
+                    for (let k = 0; k < tableau.length; k++) {
+                        if (i === k)
+                            continue;
+
+                        const possibleColumn = tableau.getColumn(k);
+                        const possibleLastCard = possibleColumn.getCard(possibleColumn.length - 1);
+
+                        if (j === 0 && !possibleLastCard)
+                            continue;
+
+                        if (cardAbove && possibleLastCard && 
+                            cardAbove.number === possibleLastCard.number &&
+                            cardAbove.isBlack === possibleLastCard.isBlack)
+                            continue;
+
+                        if (this.game.tryToMoveCardTo(Position.columnWithCard, [card, ...cards], k))
+                            return;
+                    }
+                }
+            }
+        }
     }
 }
