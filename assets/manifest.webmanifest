@@ -3,7 +3,7 @@
     "background_color": "green",
     "display": "standalone",
     "orientation": "landscape",
-    "start_url": "/",
+    "start_url": ".",
     "name": "CardGames",
     "short_name": "CardGames",
     "icons": [
