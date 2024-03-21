@@ -5,9 +5,15 @@ export class GameOptions {
     public lastGame! : string;
 
     public save() {
-        localStorage.setItem("deck", this.deck);
-        localStorage.setItem("color", this.color);
-        localStorage.setItem("lastGame", this.lastGame);
+        
+        if (this.deck)
+            localStorage.setItem("deck", this.deck);
+
+        if (this.color)
+            localStorage.setItem("color", this.color);
+
+        if (this.lastGame)
+            localStorage.setItem("lastGame", this.lastGame);
     }
 
     public static load() {

@@ -18,6 +18,7 @@
             <button class="sidebar-button button fa fa-fast-forward fa-2x" id="fast-forward" title="Avançar automaticamente" />
             <button class="sidebar-button button fa fa-cog fa-2x" title="Configurações" id="settings" />
             <button class="sidebar-button button fa fa-info-circle fa-2x" title="Sobre" id="about" />
+            <button class="sidebar-button button" style="height: 64px; width: 1px; visibility: hidden;" />
         </div>
         <canvas id="canvas"></canvas>
         <script type="module" src="index.js"></script>
@@ -46,16 +47,29 @@
         <template class="settings-template">
             <fieldset>
                 <legend>Cor de fundo</legend>
-                <div class="green color-square"></div>
-                <div class="darkslateblue color-square"></div>
-                <div class="crimson color-square"></div>
-                <div class="lightcoral color-square"></div>
-                <div class="darkcyan color-square"></div>
-                <div class="aqua color-square"></div>
-                <div class="orange color-square"></div>
-                <div class="gray color-square"></div>
-                <div class="brown color-square"></div>
+                <div class="color-square" style="background-color: green"></div>
+                <div class="color-square" style="background-color: darkslateblue"></div>
+                <div class="color-square" style="background-color: crimson"></div>
+                <div class="color-square" style="background-color: lightcoral"></div>
+                <div class="color-square" style="background-color: darkcyan"></div>
+                <div class="color-square" style="background-color: aqua"></div>
+                <div class="color-square" style="background-color: orange"></div>
+                <div class="color-square" style="background-color: gray"></div>
+                <div class="color-square" style="background-color: brown"></div>
+                <div class="color-square" style="background-color: darkblue"></div>
+                <br />
+                <div class="color-square" style="background-color: cornflowerblue"></div>
+                <div class="color-square" style="background-color: lightblue"></div>
+                <div class="color-square" style="background-color: lightsalmon"></div>
+                <div class="color-square" style="background-color: darkgray"></div>
+                <div class="color-square" style="background-color: darkslategray"></div>
+                <div class="color-square" style="background-color: #DDD"></div>
+                <div class="color-square" style="background-color: lightgreen"></div>
+                <div class="color-square" style="background-color: #222"></div>
+                <div class="color-square" style="background-color: beige"></div>
+                <div class="color-square" style="background-color: blueviolet"></div>
             </fieldset>
+            <br />
             <fieldset>
                 <legend>Tema do baralho</legend>
                 <div class="deck deck-blue"><img src="images/backb.png" /></div>

@@ -13,11 +13,7 @@ export class SettingsDialog extends Dialog {
     private defineEvents() {
         
         const dialog = this.getDialog();
-        const colorDivs = [
-            "green", "darkslateblue", "crimson", "lightcoral",
-            "darkcyan", "aqua", "orange", "gray", "brown",
-        ].map(c => dialog.querySelector(`.${c}.color-square`));
-
+        const colorDivs = dialog.querySelectorAll(`.color-square`);
 
         for (const colorDiv of colorDivs) {
             colorDiv?.addEventListener("click", function(this : HTMLElement) {
@@ -50,7 +46,7 @@ export class SettingsDialog extends Dialog {
                 result.deck = [...item.classList].filter(i => i != "selected" && i != "deck")[0];
 
             if (item.classList.contains("color-square"))
-                result.color = [...item.classList].filter(i => i != "selected" && i != "color-square")[0];
+                result.color = getComputedStyle(item).backgroundColor;
         }
 
         return result;
