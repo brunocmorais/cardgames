@@ -181,7 +181,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
         this.data.update(this.canvas.width);
     }
 
-    public getHint(): void {
+    public getHint(): boolean {
 
         const cells = this.game.cells;
         const tableau = this.game.tableau;
@@ -194,7 +194,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
                 continue;
 
             if (this.game.tryToMoveCardToSomewhere(card))
-                return;
+                return true;
         }
 
         for (let i = 0; i < tableau.length; i++) {
@@ -206,7 +206,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
 
             for (let j = 0; j < foundation.length; j++)
                 if (this.game.tryToMoveCardTo(Position.foundation, [ card ], j))
-                    return;
+                    return true;
         }
 
         for (let i = 0; i < tableau.length; i++) {
@@ -239,10 +239,27 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
                             continue;
 
                         if (this.game.tryToMoveCardTo(Position.columnWithCard, [card, ...cards], k))
-                            return;
+                            return true;
                     }
                 }
             }
         }
+
+        return false;
+    }
+
+    public isGameWon(): boolean {
+        
+        const foundations = this.game.foundation;
+
+        for (let i = 0; i < foundations.length; i++) {
+            
+            const foundation = foundations.get(i);
+
+            if (foundation.length == 0 || foundation[foundation.length - 1].number != 'K')
+                return false;
+        }
+
+        return true;
     }
 }

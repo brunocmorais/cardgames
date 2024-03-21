@@ -6,6 +6,7 @@ import { IGame } from "../Common/IGame";
 import { EmptyCardsData } from "./EmptyCardsData";
 
 export class EmptyGameContext extends BaseGameContext<IGame, IGameData> {
+    
     constructor() {
         super({ gameNumber: 0 }, new EmptyCardsData(0));
     }
@@ -17,5 +18,6 @@ export class EmptyGameContext extends BaseGameContext<IGame, IGameData> {
     protected async doActionWithReleasedCards(cards: CardData[]): Promise<void> { }
     public resetGame(): void { }
     public newGame(gameNumber? : number): void { }
-    public getHint(): void { }
+    public getHint(): boolean { return false; }
+    public isGameWon(): boolean { return false; }
 }

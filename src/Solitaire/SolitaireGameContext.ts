@@ -3,6 +3,7 @@ import { BaseCardsData } from "../Common/Data/BaseCardsData";
 import { CardData } from "../Common/Data/CardData";
 import { MoveData } from "../Common/Data/MoveData";
 import { Column } from "../Common/Model/Column";
+import { cardNumbers } from "../Common/Model/Constants";
 import { sleep } from "../Util/Functions";
 import { SolitaireGameData } from "./Data/SolitaireGameData";
 import { Position } from "./Position";
@@ -213,7 +214,83 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
         this.data.update(this.canvas.width);
     }
 
-    public getHint(): void {
-        throw new Error("Method not implemented.");
+    public getHint(): boolean {
+        
+        const waste = this.game.redistribution.waste;
+        const tableau = this.game.tableau;
+        const foundation = this.game.foundation;
+        
+        if (waste.top && this.game.tryToMoveCardToSomewhere(waste.top))
+            return true;
+
+        for (let i = 0; i < tableau.length; i++) {
+            const column = tableau.getColumn(i);
+            const card = column.getCard(column.length - 1);
+
+            if (!card)
+                continue;
+
+            if (card.flipped) {
+                card.flipped = false;
+                return true;
+            }
+
+            for (let j = 0; j < foundation.length; j++)
+                if (this.game.tryToMoveCardTo(Position.foundation, [ card ], j))
+                    return true;
+        }
+
+        for (let i = 0; i < tableau.length; i++) {
+            const column = tableau.getColumn(i);
+
+            for (let j = 0; j < column.length; j++) {
+                const card = column.getCard(j);
+                const cardAbove = column.getCard(j - 1);
+
+                if (cardAbove && cardNumbers.indexOf(cardAbove.number) === 
+                    cardNumbers.indexOf(card.number) + 1 && cardAbove.isBlack != card.isBlack)
+                    continue;
+
+                const cards = column.getCardsBelow(card);
+
+                if (this.game.checkIfCardCanStartMoving(card)) {
+                    for (let k = 0; k < tableau.length; k++) {
+                        if (i === k)
+                            continue;
+
+                        const possibleColumn = tableau.getColumn(k);
+                        const possibleLastCard = possibleColumn.getCard(possibleColumn.length - 1);
+
+                        if (j === 0 && !possibleLastCard)
+                            continue;
+
+                        if (cardAbove && possibleLastCard && 
+                            cardAbove.number === possibleLastCard.number &&
+                            cardAbove.isBlack === possibleLastCard.isBlack)
+                            continue;
+
+                        if (this.game.tryToMoveCardTo(Position.tableau, [card, ...cards], k))
+                            return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public isGameWon(): boolean {
+        
+        const foundations = this.game.foundation;
+
+        for (let i = 0; i < foundations.length; i++) {
+            
+            const foundation = foundations.get(i);
+
+            if (foundation.length == 0 || foundation[foundation.length - 1].number != 'K')
+                return false;
+        }
+
+        return true;
     }
 }

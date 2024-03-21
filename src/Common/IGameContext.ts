@@ -5,5 +5,7 @@ export interface IGameContext {
     resetGame() : void;
     newGame(gameNumber? : number) : void;
     setOptions(gameOptions : GameOptions) : Promise<void>;
-    getHint() : void;
+    getHint() : boolean;
+    fastForward() : Promise<void>;
+    isGameWon() : boolean;
 }

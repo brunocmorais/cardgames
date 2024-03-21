@@ -41,6 +41,7 @@ export class Main {
         this.defineAboutEvent();
         this.defineSelectGameNumberEvent();
         this.defineGetHelpEvent();
+        this.defineFastForwardEvent();
     }
 
     private static defineSelectGameEvent() {
@@ -124,6 +125,12 @@ export class Main {
         document.getElementById("get-help")?.addEventListener("click", async function() {
             game.getHint();
             await game.drawGame(true);
+        });
+    }
+
+    private static defineFastForwardEvent() {
+        document.getElementById("fast-forward")?.addEventListener("click", async function() {
+            await game.fastForward();
         });
     }
 }

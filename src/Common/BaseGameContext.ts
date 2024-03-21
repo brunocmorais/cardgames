@@ -7,6 +7,9 @@ import { IGameContext } from './IGameContext';
 import { IGame } from './IGame';
 import { GameBackground } from './GameBackground';
 import { GameOptions } from './Model/GameOptions';
+import { sleep } from '../Util/Functions';
+import { Dialog } from './Dialog/Dialog';
+import { DialogButtons } from './Dialog/DialogButtons';
 
 export abstract class BaseGameContext<TGame extends IGame, TData extends IGameData> implements IGameContext {
 
@@ -44,7 +47,8 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
 
     public abstract resetGame() : void;
     public abstract newGame(gameNumber? : number) : void;
-    public abstract getHint() : void;
+    public abstract getHint() : boolean;
+    public abstract isGameWon() : boolean;
 
     private setupEvents() {
 
@@ -161,8 +165,12 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         await this.background.draw();
     
-        if (update)
+        if (update) {
             this.getCardsData().update(this.canvas.width);
+
+            if (this.isGameWon())
+                new Dialog("Parabéns, você venceu!", "Parabéns", DialogButtons.Ok).showDialog();
+        }
     }
 
     public async setOptions(gameOptions: GameOptions): Promise<void> {
@@ -175,4 +183,13 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
 
         await this.drawGame(true);
     }
+
+    public async fastForward(): Promise<void> {
+        
+        while (this.getHint()) {
+            await sleep(300);
+            await this.drawGame(true);
+        }
+    }
+
 }
