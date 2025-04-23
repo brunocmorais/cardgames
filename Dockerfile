@@ -1,7 +1,10 @@
 FROM node:alpine AS build
 
 WORKDIR /usr/app
-COPY ./ /usr/app
+
+COPY assets/ ./assets/
+COPY src/ ./src/
+COPY tsconfig.json package.json webpack.config.cjs webpack.prd.config.cjs ./
 
 RUN npm install
 RUN npm run build

@@ -8,4 +8,4 @@ services:
     image: brunocmorais/cardgames
     container_name: cardgames
     ports:
-      - 80:80
+      - ${PORT}:80
