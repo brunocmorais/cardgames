@@ -15,7 +15,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-      BASE: cardgames
+      base: cardgames
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
