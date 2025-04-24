@@ -101,7 +101,8 @@ export class Main {
 
         document.getElementById("about")?.addEventListener("click", function() {
             const template = document.querySelector(".template-about") as HTMLTemplateElement;
-            const dialog = new Dialog(template.innerHTML, "Sobre o CardGames", DialogButtons.Ok);
+            const html = template.innerHTML.replace("{{year}}", new Date().getFullYear().toString());
+            const dialog = new Dialog(html, "Sobre o CardGames", DialogButtons.Ok);
             dialog.showDialog();
         });
     }
