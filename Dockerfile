@@ -1,16 +1,16 @@
-FROM node:alpine AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /usr/app
 
-COPY assets/ ./assets/
+COPY public/ ./public/
 COPY src/ ./src/
-COPY tsconfig.json package.json webpack.config.cjs webpack.prd.config.cjs ./
+COPY tsconfig.json package.json vite.config.ts index.html ./
 
-RUN npm install
-RUN npm run build
+RUN bun install
+RUN bun run build
 
 FROM jitesoft/lighttpd as publish
 
 WORKDIR /var/www/html
 
-COPY --from=build /usr/app/build/. ./
+COPY --from=build /usr/app/dist/. ./
