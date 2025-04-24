@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-    // assetsInclude: "images"
+    base: "cardgames",
     publicDir: "public"
 });
