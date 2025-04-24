@@ -3,6 +3,8 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+env:
+  BASE: cardgames
 permissions:
   contents: read
   pages: write
@@ -15,7 +17,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-      base: cardgames
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
