@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-    base: "cardgames",
-    publicDir: "public"
+    base: process.env["BASE"],
+    publicDir: "public",
 });

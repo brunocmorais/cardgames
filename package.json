@@ -9,6 +9,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "bun vite",
+    "prd": "bun run build && bunx serve dist -l 3000",
     "build": "bun vite build"
   },
   "type": "module"
