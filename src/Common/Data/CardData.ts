@@ -8,15 +8,13 @@ export class CardData {
     public y : number;
     public z : number;
     public isDragging : boolean; 
-    public image : HTMLImageElement;
     public card : Card;
 
-    constructor(x : number, y : number, z : number, isDragging : boolean, image : HTMLImageElement, card : Card) {
+    constructor(x : number, y : number, z : number, isDragging : boolean, card : Card) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.isDragging = isDragging;
-        this.image = image;
         this.card = card;
     }
 

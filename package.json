@@ -12,5 +12,8 @@
     "prd": "bun run build && bunx serve dist -l 3000",
     "build": "bun vite build"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "fontawesome-4.7": "^4.7.0"
+  }
 }

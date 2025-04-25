@@ -103,20 +103,21 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
     }
     
     private async drawCells() {
-
-        while (!this.data.freeCells.image.complete || !this.data.foundation.image.complete)
-            await sleep(100);
     
-        this.drawFreeCells();
-        this.drawFoundation();
+        await this.drawFreeCells();
+        await this.drawFoundation();
     }
     
-    private drawFoundation() {
+    private async drawFoundation() {
+        
+        while (!BaseCardsData.image.complete)
+            await sleep(100);
+        
         const cardsData = this.getCardsData();
 
         for (let i = 0; i < this.game.foundation.length; i++) {
             const foundation = this.data.foundation.get(i);
-            this.drawCell(this.data.freeCells.image, foundation.x, foundation.y);
+            this.drawCell(foundation.x, foundation.y);
 
             const foundationCards = this.game.foundation.get(i);
 
@@ -126,10 +127,14 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
         }
     }
 
-    private drawFreeCells() {
+    private async drawFreeCells() {
+        
+        while (!BaseCardsData.image.complete)
+            await sleep(100);
+
         for (let i = 0; i < this.game.cells.length; i++) {
             const freeCellData = this.data.freeCells.get(i);
-            this.drawCell(this.data.freeCells.image, freeCellData.x, freeCellData.y);
+            this.drawCell(freeCellData.x, freeCellData.y);
 
             const freeCellCard = this.game.cells.get(i);
 
@@ -139,16 +144,12 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
     }
 
     private async drawCards() {
+        
+        while (!BaseCardsData.image.complete)
+            await sleep(100);
 
         const cardsData = this.getCardsData();
         const movingCardsData = cardsData.getDraggingCards();
-
-        for (let i = 0; i < cardsData.length; i++) {
-            const data = cardsData.get(i);
-
-            while (!data.image.complete)
-                await sleep(100);
-        }
 
         for (const column of this.game.tableau.getColumns())
             for (const card of column.getCards())

@@ -120,13 +120,9 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
     private async drawCards() {
         
         const cardsData = this.getCardsData();
-
-        for (let i = 0; i < cardsData.length; i++) {
-            const data = cardsData.get(i);
-
-            while (!data.image.complete)
-                await sleep(100);
-        }
+        
+        while (!BaseCardsData.image.complete)
+            await sleep(100);
 
         for (const column of this.game.tableau.getColumns()) {
             for (const card of column.getCards()) {
@@ -156,22 +152,23 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
     private async drawCells() {
 
-        while (!this.data.foundation.image.complete)
-            await sleep(100);
-
-        while (!BaseCardsData.cardBack.complete)
+        while (!BaseCardsData.image.complete)
             await sleep(100);
     
-        this.drawFoundation();
-        this.drawRedistribution();
+        await this.drawFoundation();
+        await this.drawRedistribution();
     }
     
-    private drawFoundation() {
+    private async drawFoundation() {
+        
+        while (!BaseCardsData.image.complete)
+            await sleep(100);
+
         const cardsData = this.getCardsData();
 
         for (let i = 0; i < this.game.foundation.length; i++) {
             const foundation = this.data.foundation.get(i);
-            this.drawCell(this.data.foundation.image, foundation.x, foundation.y);
+            this.drawCell(foundation.x, foundation.y);
 
             const foundationCards = this.game.foundation.get(i);
 
@@ -181,12 +178,15 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
         }
     }
 
-    private drawRedistribution() {
+    private async drawRedistribution() {
+
+        while (!BaseCardsData.image.complete)
+            await sleep(100);
+
         const redistData = this.data.redistribution;
-        const image = redistData.image;
         const cards = redistData.stack;
 
-        this.drawCell(image, cards.x, cards.y);
+        this.drawCell(cards.x, cards.y);
     }
 
     public async drawGame(update : boolean) {

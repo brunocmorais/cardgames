@@ -4,11 +4,8 @@ import { cardWidthPadding } from "../../Common/Model/Constants";
 export class CellsData {
 
     private readonly freeCellsData : CellData[] = [];
-    public readonly image : HTMLImageElement;
 
     constructor(canvasWidth : number, freeCellsCount : number, foundationCount : number) {
-        this.image = new Image();
-        this.image.src = "images/empty.png";
         this.update(canvasWidth, freeCellsCount, foundationCount);
     }
 
@@ -30,7 +27,7 @@ export class CellsData {
             const y = 20;
 
             if (!data)
-                this.freeCellsData.push(new CellData(x, y, i, this.image));
+                this.freeCellsData.push(new CellData(x, y, i));
             else
                 data.definePosition(x, y);
         }

@@ -4,11 +4,8 @@ import { cardWidthPadding } from "../../Common/Model/Constants";
 export class FoundationData {
 
     private foundationData : CellData[] = [];
-    public readonly image: HTMLImageElement;
 
     constructor(canvasWidth : number, foundationCount : number) {
-        this.image = new Image();
-        this.image.src = "images/empty.png";
         this.update(canvasWidth, foundationCount);
     }
 
@@ -29,7 +26,7 @@ export class FoundationData {
             const y = 20;
 
             if (!this.foundationData[i])
-                this.foundationData.push(new CellData(x, 20, i, this.image));
+                this.foundationData.push(new CellData(x, 20, i));
             else
                 this.foundationData[i].definePosition(x, y);
         }

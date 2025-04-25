@@ -24,7 +24,7 @@ export class SettingsDialog extends Dialog {
             });
         }
 
-        const decks = ["deck-red", "deck-blue"]
+        const decks = ["deck-red", "deck-blue", "deck-black"]
             .map(c => dialog.querySelector(`.deck.${c}`));
 
         for (const deck of decks) {

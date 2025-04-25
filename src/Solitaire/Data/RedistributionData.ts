@@ -1,18 +1,14 @@
 import { CellData } from "../../Common/Data/CellData";
 import { cardWidthPadding } from "../../Common/Model/Constants";
-import { Solitaire } from "../Solitaire";
 
 export class RedistributionData {
 
-    public readonly image : HTMLImageElement;
     public readonly stack : CellData;
     public readonly waste : CellData;
 
     constructor(canvasWidth : number) {
-        this.image = new Image();
-        this.image.src = "images/empty.png";
-        this.stack = new CellData(0, 0, 0, this.image);
-        this.waste = new CellData(0, 0, 0, undefined);
+        this.stack = new CellData(0, 0, 0);
+        this.waste = new CellData(0, 0, 0);
         
         this.update(canvasWidth);
     }

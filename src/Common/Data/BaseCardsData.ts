@@ -5,35 +5,23 @@ export abstract class BaseCardsData {
 
     protected readonly cardsData : CardData[] = [];
     protected canvasWidth : number;
-    public static readonly cardBack : HTMLImageElement = new Image();
+    public static readonly image : HTMLImageElement = new Image();
+    public static color : string = "deck-red";
 
     constructor(canvasWidth : number) {
 
         this.canvasWidth = canvasWidth;
-
-        if (!BaseCardsData.cardBack.src)
-            BaseCardsData.cardBack.src = "images/backr.png";
+        BaseCardsData.image.src = "images/cards.png";
     }
 
     public abstract update(canvasWidth : number | undefined) : void;
 
     protected createCardData(card : Card, x : number, y : number, z : number) {
-        const image = new Image();
-        image.src = `images/${card.value}.png`;
-
-        return new CardData(x, y, z, false, image, card)
+        return new CardData(x, y, z, false, card);
     }
 
     public setCardBack(deck : string) {
-
-        switch (deck) {
-            case "deck-blue":
-                BaseCardsData.cardBack.src = "images/backb.png";
-                break;
-            case "deck-red":
-                BaseCardsData.cardBack.src = "images/backr.png";
-                break;
-        }
+        BaseCardsData.color = deck;
     }
 
     filter(fn: (x: CardData) => boolean) {

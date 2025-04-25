@@ -9,6 +9,7 @@ import { GameOptions } from './Common/Model/GameOptions';
 import { EmptyGameContext } from './Empty/EmptyGameContext';
 import "./Styles/style.css";
 import "./Styles/dialog.css";
+import "fontawesome-4.7/css/font-awesome.min.css"
 
 let game : IGameContext = new EmptyGameContext();
 let gameOptions = GameOptions.load();

@@ -150,15 +150,34 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     }
     
     protected drawCard(card : CardData) {
-        this.ctx.drawImage(card.image, card.x, card.y, card.image.width, card.image.height);
+        const imgCoord = card.card.imageCoordinate;
+        this.ctx.drawImage(BaseCardsData.image, 
+            imgCoord.x * cardSize.width, imgCoord.y * cardSize.height, cardSize.width, cardSize.height,
+            card.x, card.y, cardSize.width, cardSize.height);
     }
 
     protected drawCardBack(card : CardData) {
-        this.ctx.drawImage(BaseCardsData.cardBack, card.x, card.y, card.image.width, card.image.height);
+        const color = BaseCardsData.color;
+        let imgCoord : Coordinate;
+
+        switch (color) {
+            case "deck-red": imgCoord = { x : 6, y : 6 }; break;
+            case "deck-blue": imgCoord = { x : 5, y : 6 }; break;
+            case "deck-black": imgCoord = { x : 4, y : 6 }; break;
+            default: return;
+        }
+
+        this.ctx.drawImage(BaseCardsData.image, 
+            imgCoord.x * cardSize.width, imgCoord.y * cardSize.height, cardSize.width, cardSize.height,
+            card.x, card.y, cardSize.width, cardSize.height);
     }
     
-    protected drawCell(cell : HTMLImageElement, x : number, y : number) {
-        this.ctx.drawImage(cell, x, y, cell.width, cell.height);
+    protected drawCell(x : number, y : number) {
+        const imgCoord : Coordinate = { x: 7, y : 6 };
+
+        this.ctx.drawImage(BaseCardsData.image, 
+            imgCoord.x * cardSize.width, imgCoord.y * cardSize.height, cardSize.width, cardSize.height,
+            x, y, cardSize.width, cardSize.height);
     }
     
     public async drawGame(update : boolean) {

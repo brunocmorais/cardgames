@@ -23,7 +23,7 @@ export class ColumnsData {
             const y = cardVerticalDistance * Math.floor(i / columnCount) + 140;
     
             if (!data)
-                this.columnsData.push(new CellData(x, y, i, undefined));
+                this.columnsData.push(new CellData(x, y, i));
             else
                 data.definePosition(x, y);
         }
