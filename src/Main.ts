@@ -7,6 +7,8 @@ import { GameContextFactory } from './Common/GameContextFactory';
 import { IGameContext } from './Common/IGameContext';
 import { GameOptions } from './Common/Model/GameOptions';
 import { EmptyGameContext } from './Empty/EmptyGameContext';
+import "./Styles/style.css";
+import "./Styles/dialog.css";
 
 let game : IGameContext = new EmptyGameContext();
 let gameOptions = GameOptions.load();
