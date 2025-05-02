@@ -121,7 +121,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
         
         const cardsData = this.getCardsData();
         
-        while (!BaseCardsData.image.complete)
+        while (!this.image.complete)
             await sleep(100);
 
         for (const column of this.game.tableau.getColumns()) {
@@ -152,7 +152,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
     private async drawCells() {
 
-        while (!BaseCardsData.image.complete)
+        while (!this.image.complete)
             await sleep(100);
     
         await this.drawFoundation();
@@ -161,7 +161,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
     
     private async drawFoundation() {
         
-        while (!BaseCardsData.image.complete)
+        while (!this.image.complete)
             await sleep(100);
 
         const cardsData = this.getCardsData();
@@ -180,7 +180,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
 
     private async drawRedistribution() {
 
-        while (!BaseCardsData.image.complete)
+        while (!this.image.complete)
             await sleep(100);
 
         const redistData = this.data.redistribution;
@@ -204,7 +204,7 @@ export class SolitaireGameContext extends BaseGameContext<Solitaire, SolitaireGa
         this.data.update(this.canvas.width);
     }
 
-    public newGame(gameNumber? : number): void {
+    public startNewGame(gameNumber? : number): void {
 
         let initialGame = gameNumber ?? Math.floor(Math.random() * Math.pow(2, 32));
         document.title = "Solitaire - #" + initialGame;

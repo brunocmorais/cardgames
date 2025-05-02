@@ -19,7 +19,11 @@
             <button class="sidebar-button button" style="height: 64px; width: 1px; visibility: hidden;"></button>
         </div>
         <canvas id="canvas"></canvas>
-        <script type="module" src="src/Main.ts"></script>
+        <script type="module">
+            import { App } from "./src/App.ts";
+            
+            new App();
+        </script>
         
         <!-- Dialog declaring -->
         <dialog class="dialog center">

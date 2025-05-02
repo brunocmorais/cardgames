@@ -41,8 +41,8 @@ export class Dialog {
 
         const dialog = this.getDialog();
         const footer = this.getFooter(dialog);
-        let positive : HTMLButtonElement | undefined;
-        let negative : HTMLButtonElement | undefined;
+        let positive! : HTMLButtonElement;
+        let negative! : HTMLButtonElement;
 
         switch (buttons) {
             case DialogButtons.OkCancel:

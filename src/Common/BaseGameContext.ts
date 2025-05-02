@@ -5,7 +5,6 @@ import { BaseCardsData } from './Data/BaseCardsData';
 import { IGameData } from './Data/IGameData';
 import { IGameContext } from './IGameContext';
 import { IGame } from './IGame';
-import { GameBackground } from './GameBackground';
 import { GameOptions } from './Model/GameOptions';
 import { sleep } from '../Util/Functions';
 import { Dialog } from './Dialog/Dialog';
@@ -13,11 +12,12 @@ import { DialogButtons } from './Dialog/DialogButtons';
 
 export abstract class BaseGameContext<TGame extends IGame, TData extends IGameData> implements IGameContext {
 
-    private background : GameBackground;
     protected canvas : HTMLCanvasElement;
     protected ctx : CanvasRenderingContext2D;
     protected game : TGame;
     protected data : TData;
+    protected image : HTMLImageElement;
+    protected color : string = "green";
     
     constructor(game: TGame, data : TData) {
         const element = document.getElementById("canvas");
@@ -32,6 +32,8 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
             throw new Error("Canvas context could not be created!");
 
         this.ctx = ctx;
+        this.image  = new Image();
+        this.image.src = "images/cards.png";
 
         this.canvas.width = window.innerWidth - 64;
         this.canvas.height = window.innerHeight;
@@ -39,14 +41,13 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
         this.game = game;
         this.data = data;
 
-        this.background = new GameBackground(this.canvas, this.ctx);
         this.data.update(this.canvas.width);
         
         this.setupEvents();
     }
 
     public abstract resetGame() : void;
-    public abstract newGame(gameNumber? : number) : void;
+    public abstract startNewGame(gameNumber? : number) : void;
     public abstract getHint() : boolean;
     public abstract isGameWon() : boolean;
 
@@ -151,7 +152,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     
     protected drawCard(card : CardData) {
         const imgCoord = card.card.imageCoordinate;
-        this.ctx.drawImage(BaseCardsData.image, 
+        this.ctx.drawImage(this.image, 
             imgCoord.x * cardSize.width, imgCoord.y * cardSize.height, cardSize.width, cardSize.height,
             card.x, card.y, cardSize.width, cardSize.height);
     }
@@ -167,7 +168,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
             default: return;
         }
 
-        this.ctx.drawImage(BaseCardsData.image, 
+        this.ctx.drawImage(this.image, 
             imgCoord.x * cardSize.width, imgCoord.y * cardSize.height, cardSize.width, cardSize.height,
             card.x, card.y, cardSize.width, cardSize.height);
     }
@@ -175,14 +176,20 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     protected drawCell(x : number, y : number) {
         const imgCoord : Coordinate = { x: 7, y : 6 };
 
-        this.ctx.drawImage(BaseCardsData.image, 
+        this.ctx.drawImage(this.image, 
             imgCoord.x * cardSize.width, imgCoord.y * cardSize.height, cardSize.width, cardSize.height,
             x, y, cardSize.width, cardSize.height);
+    }
+
+    protected async drawBackground() {
+        
+        this.ctx.fillStyle = this.color;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
     public async drawGame(update : boolean) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        await this.background.draw();
+        await this.drawBackground();
     
         if (update) {
             this.getCardsData().update(this.canvas.width);
@@ -195,7 +202,7 @@ export abstract class BaseGameContext<TGame extends IGame, TData extends IGameDa
     public async setOptions(gameOptions: GameOptions): Promise<void> {
         
         if (gameOptions.color)
-            this.background.setColor(gameOptions.color);
+            this.color = gameOptions.color;
 
         if (gameOptions.deck)
             this.getCardsData().setCardBack(gameOptions.deck);

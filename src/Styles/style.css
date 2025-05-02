@@ -22,7 +22,7 @@ html, body {
 #sidebar {
     background-color: #CCC;
     height: 100vh;
-    width: 63px;
+    width: 62px;
     float: left;
     border-right: solid 1px black;
     overflow: scroll;

@@ -110,7 +110,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
     
     private async drawFoundation() {
         
-        while (!BaseCardsData.image.complete)
+        while (!this.image.complete)
             await sleep(100);
         
         const cardsData = this.getCardsData();
@@ -129,7 +129,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
 
     private async drawFreeCells() {
         
-        while (!BaseCardsData.image.complete)
+        while (!this.image.complete)
             await sleep(100);
 
         for (let i = 0; i < this.game.cells.length; i++) {
@@ -145,7 +145,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
 
     private async drawCards() {
         
-        while (!BaseCardsData.image.complete)
+        while (!this.image.complete)
             await sleep(100);
 
         const cardsData = this.getCardsData();
@@ -173,7 +173,7 @@ export class FreeCellGameContext extends BaseGameContext<FreeCell, FreeCellGameD
         this.data.update(this.canvas.width);
     }
 
-    public newGame(gameNumber ? : number): void {
+    public startNewGame(gameNumber ? : number): void {
         let initialGame = gameNumber ?? Math.floor(Math.random() * Math.pow(2, 32));
         document.title = "FreeCell - #" + initialGame;
         const freeCell = new FreeCellFactory().get(FreeCellVariant.default, [initialGame]);

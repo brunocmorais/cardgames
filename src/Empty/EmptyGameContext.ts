@@ -17,7 +17,7 @@ export class EmptyGameContext extends BaseGameContext<IGame, IGameData> {
     protected async doActionWithSelectedCards(cards: CardData[]): Promise<void> { }
     protected async doActionWithReleasedCards(cards: CardData[]): Promise<void> { }
     public resetGame(): void { }
-    public newGame(gameNumber? : number): void { }
+    public startNewGame(gameNumber? : number): void { }
     public getHint(): boolean { return false; }
     public isGameWon(): boolean { return false; }
 }
