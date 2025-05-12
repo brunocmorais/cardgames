@@ -13,16 +13,20 @@ export class App {
     private game : IGameContext;
 
     constructor() {
-        this.game = new EmptyGameContext();
-        let gameOptions = GameOptions.load();
-        this.sidebar = new Sidebar(this.game, gameOptions);
+
+        const gameOptions = GameOptions.load();
 
         if (gameOptions.lastGame) {
             this.game = GameContextFactory.get(gameOptions.lastGame);
             this.game.setOptions(gameOptions);
         } else {
-            this.sidebar.showSelectGameDialog();
+            this.game = new EmptyGameContext();
         }
+
+        this.sidebar = new Sidebar(this.game, gameOptions);
+
+        if (!gameOptions.lastGame)
+            this.sidebar.showSelectGameDialog();
 
         this.run();
     }
