@@ -18,11 +18,11 @@ export class App {
 
         if (gameOptions.lastGame) {
             this.game = GameContextFactory.get(gameOptions.lastGame);
-            this.game.setOptions(gameOptions);
         } else {
             this.game = new EmptyGameContext();
         }
-
+        
+        this.game.setOptions(gameOptions);
         this.sidebar = new Sidebar(this.game, gameOptions);
 
         if (!gameOptions.lastGame)

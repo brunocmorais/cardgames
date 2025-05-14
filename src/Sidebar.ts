@@ -20,6 +20,7 @@ export class Sidebar {
     }
 
     public showSelectGameDialog() {
+        this.selectGameDialog = new SelectGameDialog(DialogButtons.Ok, this.onSelectGame);
         this.selectGameDialog.showDialog();
     }
 
@@ -54,6 +55,7 @@ export class Sidebar {
     private defineSelectGameEvent() {
 
         document.getElementById("select-game")?.addEventListener("click", () => {
+            this.selectGameDialog = new SelectGameDialog(DialogButtons.Ok, this.onSelectGame);
             this.selectGameDialog.showDialog();
         });
     }
