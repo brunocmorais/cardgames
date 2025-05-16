@@ -9,8 +9,9 @@ COPY tsconfig.json package.json vite.config.ts index.html ./
 RUN bun install
 RUN bun run build
 
-FROM jitesoft/lighttpd as publish
+FROM nginx as publish
 
-WORKDIR /var/www/html
+WORKDIR /usr/share/nginx/html
 
 COPY --from=build /usr/app/dist/. ./
+
